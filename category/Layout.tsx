@@ -8,6 +8,7 @@
 import Link from 'next/link';
 import KalbelaGrid from './Grid';
 import Image from 'next/image';
+import Ads from '@/plugin/news-ads/ui/Ads';
 
 interface BlogCatProps {
     data: {
@@ -55,7 +56,7 @@ export default function KalbelaCategoryLayout({
     const breadcrumbLinks = ancestors.slice(0, -1);
 
     return (
-        <main className="bg-gray-50/50 min-h-screen">
+        <main className="bg-gray-50/50 min-h-screen space-y-6">
             {/* Header Banner */}
             <header className="bg-linear-to-r from-main via-main/90 to-main/80 py-10 text-white shadow-sm">
                 <div className="container">
@@ -93,11 +94,17 @@ export default function KalbelaCategoryLayout({
                 </div>
             </header>
 
+            {/* Category Page Top Ads */}
+            <Ads type="category" slot="top" settings={settings} />
+
             <div className="container py-8 space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-4 items-start">
                     {/* Sub-category chips */}
                     <div className="order-1 lg:col-span-3 self-stretch space-y-6">
-                        <div className="sticky top-10 gap-4">
+                        <div className="sticky top-10 space-y-4">
+                            {/* Category Page Left Top Ads */}
+                            <Ads type="category" slot="leftTop" settings={settings} />
+
                             {subCats.length > 0 && (
                                 <nav className="flex flex-wrap gap-2 pb-2 border-b border-gray-200" aria-label="Sub-categories">
                                     {subCats.map((sub) => (
@@ -113,6 +120,9 @@ export default function KalbelaCategoryLayout({
                             )}
 
                             <Image className="block w-full max-w-full object-cover" width={250} height={250} src="https://res.cloudinary.com/dqfdlaanx/image/upload/v1785046906/library/library/1785046901420_ad-space-01-300x250.webp" alt="Ad Space" />
+
+                            {/* Category Page Left Bottom Ads */}
+                            <Ads type="category" slot="leftBottom" settings={settings} />
                         </div>
                     </div>
 
@@ -125,12 +135,21 @@ export default function KalbelaCategoryLayout({
                         />
                     </div>
                     <div className="order-3 lg:col-span-3 self-stretch hidden md:block">
-                        <div className="sticky top-10">
+                        <div className="sticky top-10 space-y-4">
+                            {/* Category Page Right Top Ads */}
+                            <Ads type="category" slot="rightTop" settings={settings} />
+
                             <img className="block w-full max-w-full object-cover" width={250} height={250} src="https://placehold.co/300x600" alt="Ad Space" />
+
+                            {/* Category Page Right Bottom Ads */}
+                            <Ads type="category" slot="rightBottom" settings={settings} />
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Category Page Bottom Ads */}
+            <Ads type="category" slot="bottom" settings={settings} />
         </main>
     );
 }

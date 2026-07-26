@@ -5,6 +5,7 @@
  *
  * Standalone grid component for Kalbela category layout.
  * Dynamic box resolution with KalbelaBox default fallback.
+ * Inserts middle ad banners after every 3 consecutive posts.
  */
 
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import Link from 'next/link';
 import { getHooks } from '@/hook';
 import { useActivePlugins } from '@/hook/useActivePlugins';
 import KalbelaBox from '../box/Box';
+import Ads from '@/plugin/news-ads/ui/Ads';
 
 interface Post {
     _id: string;
@@ -97,12 +99,19 @@ export default function KalbelaGrid({
 
     return (
         <div className={gridClassName}>
-            {posts.map((post) => (
-                <CardComponent
-                    key={post._id}
-                    data={post}
-                    postUrl={buildUrl(postPrefix, post.slug)}
-                />
+            {posts.map((post, idx) => (
+                <div key={post._id || idx} className="space-y-4">
+                    <CardComponent
+                        data={post}
+                        postUrl={buildUrl(postPrefix, post.slug)}
+                    />
+                    {/* Insert Middle Ad banner after every 3 consecutive posts */}
+                    {(idx + 1) % 3 === 0 && (
+                        <div className="py-2">
+                            <Ads type="category" slot="middle" />
+                        </div>
+                    )}
+                </div>
             ))}
         </div>
     );

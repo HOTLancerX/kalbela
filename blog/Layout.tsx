@@ -13,6 +13,7 @@ import { Icon } from '@iconify/react';
 import KalbelaBlogDetails from './details';
 import KalbelaRelated from './Related';
 import Latest from './Latest';
+import Ads from '@/plugin/news-ads/ui/Ads';
 
 interface BlogPostProps {
     data: {
@@ -68,13 +69,16 @@ export default function KalbelaBlogLayout({
             data.info?.userName ||
             data.info?.reporter ||
             data.info?.authorName ||
-            'কালবেলা ডেস্ক',
+            '',
         image: data.info?.authorImage || data.info?.userImage || '',
         type: data.info?.authorType || 'reporter',
     };
 
     return (
-        <main className="min-h-screen py-8">
+        <main className="min-h-screen py-8 space-y-6">
+            {/* Single Page Top Ads */}
+            <Ads type="single" slot="top" settings={settings} />
+
             <div className="container space-y-6">
                 {/* Breadcrumb Navigation */}
                 <nav
@@ -106,6 +110,9 @@ export default function KalbelaBlogLayout({
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-4 items-start">
                     {/* 25% Column: user, category, date, related */}
                     <div className="order-2 lg:order-1 lg:col-span-3 space-y-6">
+                        {/* Single Page Left Top Ads */}
+                        <Ads type="single" slot="leftTop" settings={settings} />
+
                         {/* User / Author Info */}
                         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-xs space-y-3">
                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
@@ -182,6 +189,9 @@ export default function KalbelaBlogLayout({
                             postPrefix={postPrefix}
                             activeBox={(pageData as any)?.activeBox}
                         />
+
+                        {/* Single Page Left Bottom Ads */}
+                        <Ads type="single" slot="leftBottom" settings={settings} />
                     </div>
 
                     {/* 50% Column: title, images, description */}
@@ -197,12 +207,21 @@ export default function KalbelaBlogLayout({
 
                     {/* 25% Column: Latest & Popular posts widget */}
                     <div className="order-3 lg:order-3 lg:col-span-3 self-stretch hidden md:block">
-                        <div className="sticky top-10">
+                        <div className="sticky top-10 space-y-6">
+                            {/* Single Page Right Top Ads */}
+                            <Ads type="single" slot="rightTop" settings={settings} />
+
                             <Latest latest="latest" popular="popular" total={15} postPrefix={postPrefix} />
+
+                            {/* Single Page Right Bottom Ads */}
+                            <Ads type="single" slot="rightBottom" settings={settings} />
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Single Page Bottom Ads */}
+            <Ads type="single" slot="bottom" settings={settings} />
         </main>
     );
 }
