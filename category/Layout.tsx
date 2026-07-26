@@ -7,6 +7,7 @@
 
 import Link from 'next/link';
 import KalbelaGrid from './Grid';
+import Image from 'next/image';
 
 interface BlogCatProps {
     data: {
@@ -95,20 +96,24 @@ export default function KalbelaCategoryLayout({
             <div className="container py-8 space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-4 items-start">
                     {/* Sub-category chips */}
-                    <div className="order-1 lg:col-span-3 space-y-6">
-                        {subCats.length > 0 && (
-                            <nav className="flex flex-wrap gap-2 pb-2 border-b border-gray-200" aria-label="Sub-categories">
-                                {subCats.map((sub) => (
-                                    <Link
-                                        key={sub._id}
-                                        href={buildUrl(catPrefix, sub.slug)}
-                                        className="inline-flex items-center px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs sm:text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-colors shadow-2xs"
-                                    >
-                                        {sub.title}
-                                    </Link>
-                                ))}
-                            </nav>
-                        )}
+                    <div className="order-1 lg:col-span-3 self-stretch space-y-6">
+                        <div className="sticky top-10 gap-4">
+                            {subCats.length > 0 && (
+                                <nav className="flex flex-wrap gap-2 pb-2 border-b border-gray-200" aria-label="Sub-categories">
+                                    {subCats.map((sub) => (
+                                        <Link
+                                            key={sub._id}
+                                            href={buildUrl(catPrefix, sub.slug)}
+                                            className="inline-flex items-center px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs sm:text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-colors shadow-2xs"
+                                        >
+                                            {sub.title}
+                                        </Link>
+                                    ))}
+                                </nav>
+                            )}
+
+                            <Image className="block w-full max-w-full object-cover" width={250} height={250} src="https://res.cloudinary.com/dqfdlaanx/image/upload/v1785046906/library/library/1785046901420_ad-space-01-300x250.webp" alt="Ad Space" />
+                        </div>
                     </div>
 
                     {/* Post Grid - Grid 1 (Single column list) */}
@@ -119,7 +124,11 @@ export default function KalbelaCategoryLayout({
                             postPrefix={postPrefix}
                         />
                     </div>
-                    <div className="order-3 lg:col-span-3 self-stretch hidden md:block"></div>
+                    <div className="order-3 lg:col-span-3 self-stretch hidden md:block">
+                        <div className="sticky top-10">
+                            <img className="block w-full max-w-full object-cover" width={250} height={250} src="https://placehold.co/300x600" alt="Ad Space" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
