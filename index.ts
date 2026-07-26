@@ -20,6 +20,7 @@ import kalbela13Element from "@/plugin/kalbela/elements/kalbela13";
 import kalbela14Element from "@/plugin/kalbela/elements/kalbela14";
 import Headerkb from "./header/Header";
 import KalbelaBox from "./box/Box";
+import KalbelaBoxs from "./box/Boxs";
 import KalbelaCategoryLayout from "./category/Layout";
 import KalbelaBlogLayout from "./blog/Layout";
 
@@ -55,6 +56,16 @@ export function register() {
             position: 40,
             active: true,
             component: KalbelaBox,
+        },
+        {
+            key: "blog-related",
+            label: "Kalbela Related",
+            type: "blog-related",
+            slug: "dynamic",
+            style: "left",
+            position: 40,
+            active: true,
+            component: KalbelaBoxs,
         },
         {
             key: "blog-category",

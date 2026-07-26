@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 
-interface BlogBoxProps {
+interface BlogBoxsProps {
     data: {
         _id: string;
         title: string;
@@ -27,7 +27,7 @@ interface BlogBoxProps {
     postUrl: string;
 }
 
-export default function KalbelaBox({ data, postUrl }: BlogBoxProps) {
+export default function KalbelaBoxs({ data, postUrl }: BlogBoxsProps) {
     const image = data.info?.images
         ? (() => {
               try {
@@ -39,29 +39,20 @@ export default function KalbelaBox({ data, postUrl }: BlogBoxProps) {
           })()
         : '';
 
-    const shortDesc = data.info?.description ?? '';
-    const publishedAt = data.createdAt
-        ? new Date(data.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-          })
-        : null;
-
     return (
-        <article className="group flex flex-col md:flex-row bg-white rounded-xl shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden">
+        <article className="group flex flex-row items-center bg-white rounded-xl shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden">
             {/* Thumbnail */}
             <Link
                 href={postUrl}
-                className="shrink-0 w-full sm:w-52 md:w-64 aspect-video sm:aspect-4/3 block relative"
+                className="shrink-0 w-20 h-16 aspect-video sm:aspect-4/3 block relative"
             >
                 {image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <Image
                         src={image}
-                        width={300}
-                        height={200}
                         alt={data.title}
+                        width={180}
+                        height={80}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
@@ -72,28 +63,12 @@ export default function KalbelaBox({ data, postUrl }: BlogBoxProps) {
             </Link>
 
             {/* Content */}
-            <div className="flex flex-col flex-1 min-w-0 justify-center gap-1.5 p-2 md:p-4">
-                <Link
-                    href={postUrl}
-                    className="text-base sm:text-lg md:text-xl font-bold text-gray-600 hover:text-main transition-colors line-clamp-2 leading-snug"
-                >
-                    {data.title}
-                </Link>
-
-                {shortDesc && (
-                    <div
-                        className="text-xs sm:text-sm text-gray-700 line-clamp-3 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: shortDesc }}
-                    />
-                )}
-
-                {publishedAt && (
-                    <time className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                        <Icon icon="solar:calendar-bold" width="11" height="11" />
-                        {publishedAt}
-                    </time>
-                )}
-            </div>
+            <Link
+                href={postUrl}
+                className="p-2 text-base font-medium text-gray-700 hover:text-main transition-colors line-clamp-2"
+            >
+                {data.title}
+            </Link>
         </article>
     );
 }

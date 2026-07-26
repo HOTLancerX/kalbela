@@ -2,13 +2,17 @@
  * Kalbela Blog Layout — Single blog post layout.
  *
  * Receives `data`, `settings`, `permalinkMap`, and `pageData` from slug page.
- * Renders breadcrumb navigation, KalbelaBlogDetails, related category posts, and author user details.
+ * Implements Desktop 3-Column Layout:
+ * - Left 25% (lg:col-span-3): user, category, date, related
+ * - Center 50% (lg:col-span-6): title, images, description
+ * - Right 25% (lg:col-span-3): empty column container
  */
 
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import KalbelaBlogDetails from './details';
 import KalbelaRelated from './Related';
+import Latest from './Latest';
 
 interface BlogPostProps {
     data: {
@@ -27,6 +31,7 @@ interface BlogPostProps {
         categoryAncestors?: { _id: string; title: string; slug: string }[];
         relatedPosts?: any[];
         author?: { _id?: string; name?: string; image?: string; slug?: string; type?: string } | null;
+        activeBox?: any;
     };
 }
 
@@ -41,6 +46,14 @@ export default function KalbelaBlogLayout({
     permalinkMap = {},
     pageData,
 }: BlogPostProps) {
+    const categoryAncestors = pageData?.categoryAncestors ?? [];
+    const relatedPosts = pageData?.relatedPosts ?? [];
+
+    const postPrefix = (permalinkMap['blog'] ?? 'blog').trim().replace(/^\/+|\/+$/g, '') || 'blog';
+    const catPrefix = (permalinkMap['blog-category'] ?? 'blog/category')
+        .trim()
+        .replace(/^\/+|\/+$/g, '');
+
     const publishedAt = data.createdAt
         ? new Date(data.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -49,14 +62,6 @@ export default function KalbelaBlogLayout({
           })
         : null;
 
-    const seoTitle = data.info?.seo_meta_title || data.info?.seo_title || '';
-    const seoDesc = data.info?.seo_meta_description || data.info?.seo_description || '';
-    const seoKeywords = data.info?.seo_meta_keyword || '';
-
-    const categoryAncestors = pageData?.categoryAncestors ?? [];
-    const relatedPosts = pageData?.relatedPosts ?? [];
-
-    // Fallback author resolution
     const author = pageData?.author || {
         name:
             data.info?.author ||
@@ -65,13 +70,8 @@ export default function KalbelaBlogLayout({
             data.info?.authorName ||
             'কালবেলা ডেস্ক',
         image: data.info?.authorImage || data.info?.userImage || '',
-        type: 'reporter',
+        type: data.info?.authorType || 'reporter',
     };
-
-    const postPrefix = (permalinkMap['blog'] ?? 'blog').trim().replace(/^\/+|\/+$/g, '') || 'blog';
-    const catPrefix = (permalinkMap['blog-category'] ?? 'blog/category')
-        .trim()
-        .replace(/^\/+|\/+$/g, '');
 
     return (
         <main className="min-h-screen py-8">
@@ -102,21 +102,81 @@ export default function KalbelaBlogLayout({
                     </span>
                 </nav>
 
-                
-
-                {/* Main Content Layout Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Main Post Details & Related Posts */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Main Post Details Component */}
-                        <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-xs">
-                            <KalbelaBlogDetails
-                                data={data}
-                                pageData={pageData}
-                                permalinkMap={permalinkMap}
-                            />
+                {/* Main 3-Column Desktop Grid Layout (25% | 50% | 25%) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-4 items-start">
+                    {/* 25% Column: user, category, date, related */}
+                    <div className="order-2 lg:order-1 lg:col-span-3 space-y-6">
+                        {/* User / Author Info */}
+                        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-xs space-y-3">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                Author
+                            </h3>
+                            <div className="flex items-center gap-3">
+                                {author.image ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                        src={author.image}
+                                        alt={author.name || 'Author'}
+                                        className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-2xs"
+                                    />
+                                ) : (
+                                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm border border-emerald-200">
+                                        {(author.name || 'K').charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                                <div className="overflow-hidden">
+                                    <div className="font-bold text-gray-900 text-sm truncate">
+                                        {author.name}
+                                    </div>
+                                    {author.type && (
+                                        <div className="text-xs text-gray-500 capitalize">
+                                            {author.type}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                        {/* Related Category Posts Section (Active blog-box) */}
+
+                        {/* Category Info */}
+                        {categoryAncestors.length > 0 && (
+                            <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-xs space-y-2">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Icon icon="solar:folder-bold" className="text-emerald-700" width="14" height="14" />
+                                    Category
+                                </h3>
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                    {categoryAncestors.map((cat) => (
+                                        <Link
+                                            key={cat._id}
+                                            href={buildUrl(catPrefix, cat.slug)}
+                                            className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-semibold text-xs transition-colors border border-emerald-100"
+                                        >
+                                            {cat.title}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Date Info */}
+                        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-xs space-y-2">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Icon icon="solar:calendar-bold" className="text-emerald-700" width="14" height="14" />
+                                Date
+                            </h3>
+                            <div className="flex items-center justify-between gap-2 pt-1 text-xs">
+                                {publishedAt && (
+                                    <time className="font-medium text-gray-700">{publishedAt}</time>
+                                )}
+                                {data.status && (
+                                    <span className="capitalize px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-semibold text-[10px] border border-emerald-200">
+                                        {data.status}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Related Posts */}
                         <KalbelaRelated
                             posts={relatedPosts}
                             postPrefix={postPrefix}
@@ -124,10 +184,23 @@ export default function KalbelaBlogLayout({
                         />
                     </div>
 
-                    {/* Right Column: Sidebar */}
-                    <aside className="space-y-6">
-                        
-                    </aside>
+                    {/* 50% Column: title, images, description */}
+                    <div className="order-1 lg:order-2 lg:col-span-6 space-y-6">
+                        <div className="bg-white rounded-xl border border-gray-100 p-2 md:p-4 shadow-xs">
+                            <KalbelaBlogDetails
+                                data={data}
+                                pageData={pageData}
+                                permalinkMap={permalinkMap}
+                            />
+                        </div>
+                    </div>
+
+                    {/* 25% Column: Latest & Popular posts widget */}
+                    <div className="order-3 lg:order-3 lg:col-span-3 self-stretch hidden md:block">
+                        <div className="sticky top-10">
+                            <Latest latest="latest" popular="popular" total={15} postPrefix={postPrefix} />
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

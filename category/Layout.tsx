@@ -56,8 +56,8 @@ export default function KalbelaCategoryLayout({
     return (
         <main className="bg-gray-50/50 min-h-screen">
             {/* Header Banner */}
-            <header className="bg-linear-to-r from-emerald-800 via-teal-800 to-emerald-900 py-10 px-6 text-white shadow-sm">
-                <div className="container max-w-6xl mx-auto">
+            <header className="bg-linear-to-r from-main via-main/90 to-main/80 py-10 text-white shadow-sm">
+                <div className="container">
                     {/* Breadcrumb */}
                     <nav
                         className="flex items-center gap-1.5 text-xs sm:text-sm text-white/80 mb-3 flex-wrap"
@@ -93,27 +93,34 @@ export default function KalbelaCategoryLayout({
             </header>
 
             <div className="container py-8 space-y-6">
-                {/* Sub-category chips */}
-                {subCats.length > 0 && (
-                    <nav className="flex flex-wrap gap-2 pb-2 border-b border-gray-200" aria-label="Sub-categories">
-                        {subCats.map((sub) => (
-                            <Link
-                                key={sub._id}
-                                href={buildUrl(catPrefix, sub.slug)}
-                                className="inline-flex items-center px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs sm:text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-colors shadow-2xs"
-                            >
-                                {sub.title}
-                            </Link>
-                        ))}
-                    </nav>
-                )}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-4 items-start">
+                    {/* Sub-category chips */}
+                    <div className="order-1 lg:col-span-3 space-y-6">
+                        {subCats.length > 0 && (
+                            <nav className="flex flex-wrap gap-2 pb-2 border-b border-gray-200" aria-label="Sub-categories">
+                                {subCats.map((sub) => (
+                                    <Link
+                                        key={sub._id}
+                                        href={buildUrl(catPrefix, sub.slug)}
+                                        className="inline-flex items-center px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs sm:text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-700 transition-colors shadow-2xs"
+                                    >
+                                        {sub.title}
+                                    </Link>
+                                ))}
+                            </nav>
+                        )}
+                    </div>
 
-                {/* Post Grid - Grid 1 (Single column list) */}
-                <KalbelaGrid
-                    posts={posts}
-                    activeBox={activeBox}
-                    postPrefix={postPrefix}
-                />
+                    {/* Post Grid - Grid 1 (Single column list) */}
+                    <div className="order-2 lg:col-span-6 space-y-6">
+                        <KalbelaGrid
+                            posts={posts}
+                            activeBox={activeBox}
+                            postPrefix={postPrefix}
+                        />
+                    </div>
+                    <div className="order-3 lg:col-span-3 self-stretch hidden md:block"></div>
+                </div>
             </div>
         </main>
     );

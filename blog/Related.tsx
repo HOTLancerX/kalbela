@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react';
 import { getHooks } from '@/hook';
 import { useActivePlugins } from '@/hook/useActivePlugins';
-import KalbelaBox from '../box/Box';
+import KalbelaBoxs from '../box/Boxs';
 
 interface Post {
     _id: string;
@@ -43,7 +43,7 @@ export default function KalbelaRelated({
         if (activePlugins === null) return;
 
         const boxes = getHooks('root.pages').filter(
-            (p) => p.type === 'blog-box' && p.slug === 'dynamic'
+            (p) => p.type === 'blog-related' && p.slug === 'dynamic'
         );
 
         let match = null;
@@ -57,12 +57,12 @@ export default function KalbelaRelated({
             match = (boxes.find((b) => b.active === true) ?? boxes[0])?.component ?? null;
         }
 
-        setBoxComponent(() => match || KalbelaBox);
+        setBoxComponent(() => match || KalbelaBoxs);
     }, [activePlugins, activeBox]);
 
     if (!posts || posts.length === 0) return null;
 
-    const CardComponent = BoxComponent || KalbelaBox;
+    const CardComponent = BoxComponent || KalbelaBoxs;
 
     return (
         <div className="space-y-4">
