@@ -2,7 +2,7 @@
  * plugin/kalbela/index.ts — Kalbela News plugin (Single-File Element Architecture).
  */
 
-import { addBuilderElement, type PluginMeta } from "@/hook";
+import { addBuilderElement, addHook, type PluginMeta } from "@/hook";
 import kalbela1Element from "@/plugin/kalbela/elements/kalbela1";
 import kalbela2Element from "@/plugin/kalbela/elements/kalbela2";
 import kalbela3Element from "@/plugin/kalbela/elements/kalbela3";
@@ -17,6 +17,7 @@ import kalbela11Element from "@/plugin/kalbela/elements/kalbela11";
 import kalbela12Element from "@/plugin/kalbela/elements/kalbela12";
 import kalbela13Element from "@/plugin/kalbela/elements/kalbela13";
 import kalbela14Element from "@/plugin/kalbela/elements/kalbela14";
+import Headerkb from "./header/Header";
 
 export const PLUGINS: PluginMeta = {
     nx: "com.system.kalbela",
@@ -30,6 +31,19 @@ export const PLUGINS: PluginMeta = {
 };
 
 export function register() {
+    addHook("root.pages", [
+        {
+            key: "header",
+            label: "Header 1",
+            type: "header",
+            slug: "layout",
+            style: "left",
+            position: 10,
+            active: true,           // first-boot default
+            component: Headerkb,
+        },
+    ], PLUGINS.nx);
+
     addBuilderElement(kalbela1Element, PLUGINS.nx);
     addBuilderElement(kalbela2Element, PLUGINS.nx);
     addBuilderElement(kalbela3Element, PLUGINS.nx);

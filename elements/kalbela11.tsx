@@ -24,6 +24,7 @@ interface Kalbela11Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     leftCount?: number;
     colors?: NewsColors;
     showDate?: boolean;
@@ -34,6 +35,7 @@ export function Kalbela11UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     leftCount = 2,
     colors = {},
     showDate = true,
@@ -142,11 +144,11 @@ export function Kalbela11UI({
 }
 
 function Kalbela11CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 5;
+    const limit: number = Number(c.limit) || 5;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 

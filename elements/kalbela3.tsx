@@ -25,6 +25,7 @@ interface Kalbela3Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
@@ -55,6 +56,7 @@ export function Kalbela3UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     columnsDesktop = 4,
     columnsTablet = 3,
     columnsMobile = 1,
@@ -91,7 +93,7 @@ export function Kalbela3UI({
     const slideFlexClass = getEmblaSlideFlexClass(columnsDesktop, columnsTablet, columnsMobile);
 
     return (
-        <div className="w-full flex flex-col gap-3 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -126,13 +128,14 @@ export function Kalbela3UI({
                     <div className="overflow-hidden rounded-xl" ref={emblaRef}>
                         <div className="flex -mr-4">
                             {posts.map((post) => (
-                                <div
+                                <a
+                                    href={post.postUrl || "#"}
                                     key={post._id}
                                     className={`min-w-0 pr-4 shrink-0 ${slideFlexClass}`}
                                 >
                                     <div className="group/item flex flex-col gap-2">
                                         {/* Video Thumbnail Box */}
-                                        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-black">
+                                        <div className="relative aspect-16/10 w-full overflow-hidden rounded-xl bg-black">
                                             {post.image && (
                                                 <img
                                                     src={post.image}
@@ -153,8 +156,8 @@ export function Kalbela3UI({
 
                                         {/* Main Headline Title & Date below Image */}
                                         <div className="flex flex-col gap-1 px-0.5">
-                                            <h3 className="text-xs md:text-sm font-bold text-blue-600 hover:text-blue-700 leading-snug line-clamp-2 transition-colors">
-                                                {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                            <h3 className="text-xs md:text-sm font-bold text-gray-700 hover:text-main leading-snug line-clamp-2 transition-colors">
+                                                {post.title}
                                             </h3>
                                             {showDate && (
                                                 <div className="flex items-center gap-1 text-[11px] text-gray-500 mt-0.5">
@@ -166,7 +169,7 @@ export function Kalbela3UI({
                                             )}
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             ))}
                         </div>
                     </div>
@@ -177,11 +180,11 @@ export function Kalbela3UI({
 }
 
 function Kalbela3CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 8;
+    const limit: number = Number(c.limit) || 8;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 

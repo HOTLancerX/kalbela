@@ -30,6 +30,7 @@ interface Kalbela4Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     itemsPerSlide?: number;
     excerptLimit?: number;
     colors?: Kalbela4Colors;
@@ -38,16 +39,16 @@ interface Kalbela4Props {
 }
 
 function truncateHtmlText(html: string, maxLen: number = 120) {
-    if (!html) return "";
-    const cleanText = html.replace(/<[^>]*>/g, "").trim();
-    if (cleanText.length <= maxLen) return cleanText;
-    return cleanText.slice(0, maxLen).trim() + "...";
+    const text = html.replace(/<[^>]*>/g, "").trim();
+    if (text.length <= maxLen) return text;
+    return text.slice(0, maxLen) + "...";
 }
 
 export function Kalbela4UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     itemsPerSlide = 3,
     excerptLimit = 120,
     colors = {},
@@ -94,7 +95,7 @@ export function Kalbela4UI({
     }, [emblaApi, onSelect]);
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -184,11 +185,11 @@ export function Kalbela4UI({
 }
 
 function Kalbela4CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 9;
+    const limit: number = Number(c.limit) || 9;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 

@@ -26,6 +26,7 @@ interface Kalbela8Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     leadCount?: number;
     leftImagePosition?: "left" | "right";
     rightImagePosition?: "left" | "right";
@@ -38,6 +39,7 @@ export function Kalbela8UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     leadCount = 2,
     leftImagePosition = "left",
     rightImagePosition = "right",
@@ -147,11 +149,11 @@ export function Kalbela8UI({
 }
 
 function Kalbela8CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 5;
+    const limit: number = Number(c.limit) || 5;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 

@@ -27,6 +27,7 @@ interface Kalbela6Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
@@ -39,6 +40,7 @@ export function Kalbela6UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     columnsDesktop = 3,
     columnsTablet = 2,
     columnsMobile = 1,
@@ -77,7 +79,7 @@ export function Kalbela6UI({
     const gridClass = `${mobColsClass} ${tabColsClass} ${deskColsClass}`;
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -92,7 +94,7 @@ export function Kalbela6UI({
                 <div className={`grid ${gridClass} gap-6 items-start`}>
                     {/* Col 1: Main Lead News Card */}
                     {leadPost && (
-                        <div className="group flex flex-col gap-3 lg:border-r lg:border-gray-200 lg:pr-5">
+                        <a href={leadPost.postUrl || "#"} className="group flex flex-col gap-3 lg:border-r lg:border-gray-200 lg:pr-5">
                             {leadPost.image && (
                                 <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
                                     <img
@@ -102,8 +104,8 @@ export function Kalbela6UI({
                                     />
                                 </div>
                             )}
-                            <h2 className="text-lg md:text-xl font-extrabold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                                {showLink ? <a href={leadPost.postUrl || "#"}>{leadPost.title}</a> : leadPost.title}
+                            <h2 className="text-base line-clamp-3 font-medium text-gray-900 leading-snug group-hover:text-main transition-colors">
+                                {leadPost.title}
                             </h2>
                             {leadPost.excerpt && (
                                 <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-4">
@@ -118,7 +120,7 @@ export function Kalbela6UI({
                                     </span>
                                 </div>
                             )}
-                        </div>
+                        </a>
                     )}
 
                     {/* Col 2: Thumbnail List */}
@@ -187,11 +189,11 @@ export function Kalbela6UI({
 }
 
 function Kalbela6CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 11;
+    const limit: number = Number(c.limit) || 11;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 

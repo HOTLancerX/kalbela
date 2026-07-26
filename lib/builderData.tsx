@@ -1,7 +1,7 @@
 /**
  * plugin/kalbela/lib/builderData.tsx
  *
- * SERVER-ONLY. Registers server-side renderers for kalbela elements 1 through 12.
+ * SERVER-ONLY. Registers server-side renderers for kalbela elements 1 through 14.
  */
 
 import { registerBuilderElement } from "@/hook/builderDataHooks";
@@ -35,15 +35,17 @@ async function getEnrichedData(categoryIds?: string[], limit: number = 12) {
 
 // Register kalbela-1
 registerBuilderElement("kalbela-1", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 7));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 7;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela1UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 3}
             columnsMobile={Number(c.columnsMobile) || 1}
@@ -61,9 +63,10 @@ registerBuilderElement("kalbela-1", async (schema, data) => {
 
 // Register kalbela-2
 registerBuilderElement("kalbela-2", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 6));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 6;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela2UI
@@ -85,9 +88,10 @@ registerBuilderElement("kalbela-2", async (schema, data) => {
 
 // Register kalbela-3
 registerBuilderElement("kalbela-3", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 8));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 8;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela3UI
@@ -111,9 +115,10 @@ registerBuilderElement("kalbela-3", async (schema, data) => {
 
 // Register kalbela-4
 registerBuilderElement("kalbela-4", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 9));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 9;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela4UI
@@ -137,18 +142,22 @@ registerBuilderElement("kalbela-4", async (schema, data) => {
 
 // Register kalbela-5
 registerBuilderElement("kalbela-5", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 6));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 6;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela5UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
+            imageHeightDesktop={Number(c.imageHeightDesktop) || 200}
+            imageHeightMobile={Number(c.imageHeightMobile) || 160}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -164,9 +173,10 @@ registerBuilderElement("kalbela-5", async (schema, data) => {
 
 // Register kalbela-6
 registerBuilderElement("kalbela-6", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 11));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 11;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela6UI
@@ -189,9 +199,10 @@ registerBuilderElement("kalbela-6", async (schema, data) => {
 
 // Register kalbela-7
 registerBuilderElement("kalbela-7", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 7));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 7;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela7UI
@@ -215,9 +226,10 @@ registerBuilderElement("kalbela-7", async (schema, data) => {
 
 // Register kalbela-8
 registerBuilderElement("kalbela-8", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 5));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 5;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela8UI
@@ -240,9 +252,10 @@ registerBuilderElement("kalbela-8", async (schema, data) => {
 
 // Register kalbela-9
 registerBuilderElement("kalbela-9", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 7));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 7;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela9UI
@@ -268,9 +281,10 @@ registerBuilderElement("kalbela-9", async (schema, data) => {
 
 // Register kalbela-10
 registerBuilderElement("kalbela-10", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 7));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 7;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela10UI
@@ -297,9 +311,10 @@ registerBuilderElement("kalbela-10", async (schema, data) => {
 
 // Register kalbela-11
 registerBuilderElement("kalbela-11", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 5));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 5;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela11UI
@@ -320,9 +335,10 @@ registerBuilderElement("kalbela-11", async (schema, data) => {
 
 // Register kalbela-12
 registerBuilderElement("kalbela-12", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 8));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 8;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela12UI
@@ -342,9 +358,10 @@ registerBuilderElement("kalbela-12", async (schema, data) => {
 
 // Register kalbela-13
 registerBuilderElement("kalbela-13", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 8));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 8;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela13UI
@@ -371,9 +388,10 @@ registerBuilderElement("kalbela-13", async (schema, data) => {
 
 // Register kalbela-14
 registerBuilderElement("kalbela-14", async (schema, data) => {
-    const c = schema?.content ?? {};
-    const s = schema?.style ?? {};
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, c.limit ?? 8));
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 8;
+    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
 
     return (
         <Kalbela14UI

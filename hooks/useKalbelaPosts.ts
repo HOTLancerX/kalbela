@@ -20,7 +20,7 @@ export function useKalbelaPosts(categoryIds: string[] = [], limit: number = 7) {
                     : allCats.map((cat) => ({ _id: cat._id, title: cat.title, url: `/${cat.slug}` }));
 
                 setTabs(orderedTabs);
-                const safeLimit = Math.min(Number(limit) || 7, 20);
+                const safeLimit = Math.min(Math.max(1, Number(limit) || 6), 50);
                 const results = await Promise.all(
                     orderedTabs.map((tab) => {
                         const params = new URLSearchParams({ type: "blog", limit: String(safeLimit), cats: tab._id });
@@ -28,7 +28,7 @@ export function useKalbelaPosts(categoryIds: string[] = [], limit: number = 7) {
                             .then((r) => r.json())
                             .then((d) => ({
                                 id: tab._id,
-                                posts: ((d.posts ?? []) as any[]).map((p): TabPost => ({
+                                posts: ((d.posts ?? []) as any[]).slice(0, safeLimit).map((p): TabPost => ({
                                     _id: p._id,
                                     title: p.title,
                                     slug: p.slug,

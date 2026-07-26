@@ -24,9 +24,12 @@ interface Kalbela5Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
+    imageHeightDesktop?: number;
+    imageHeightMobile?: number;
     colors?: NewsColors;
     showCategory?: boolean;
     showExcerpt?: boolean;
@@ -38,9 +41,12 @@ export function Kalbela5UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     columnsDesktop = 3,
     columnsTablet = 2,
     columnsMobile = 1,
+    imageHeightDesktop = 200,
+    imageHeightMobile = 160,
     colors = {},
     showCategory = true,
     showExcerpt = true,
@@ -55,7 +61,8 @@ export function Kalbela5UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     const deskColsClass =
         columnsDesktop === 6 ? "lg:grid-cols-6" :
@@ -74,7 +81,7 @@ export function Kalbela5UI({
     const gridClass = `${mobColsClass} ${tabColsClass} ${deskColsClass}`;
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -86,38 +93,46 @@ export function Kalbela5UI({
 
             {/* Grid Container */}
             {posts.length > 0 && (
-                <div className={`grid ${gridClass} gap-4 md:gap-5`}>
+                <div className={`grid ${gridClass} gap-2 md:gap-4`}>
                     {posts.map((post) => (
-                        <div
+                        <a
+                            href={post.postUrl || "#"}
                             key={post._id}
-                            className="group flex flex-col gap-3 rounded-2xl border border-gray-200/90 bg-white p-4 shadow-sm hover:shadow-md transition-all"
+                            className="group/item flex flex-col rounded-xl overflow-hidden bg-white shadow-sm group-hover/item:hover:shadow-md transition-all"
                         >
                             {/* Card Image */}
                             {post.image && (
-                                <div className="aspect-[16/10] w-full overflow-hidden rounded-xl bg-gray-100">
+                                <div
+                                    className="w-full overflow-hidden shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                    style={{
+                                        "--h-mob": `${imageHeightMobile}px`,
+                                        "--h-desk": `${imageHeightDesktop}px`,
+                                    } as React.CSSProperties}
+                                >
                                     <img
                                         src={post.image}
                                         alt={post.title}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover/item:scale-105"
                                     />
                                 </div>
                             )}
+                            <div className="p-2">
+                                {/* Headline Title with Category Prefix */}
+                                <h3 className="text-base line-clamp-2 font-medium text-gray-900 leading-snug group-hover/item:text-main transition-colors">
+                                    {showCategory && post.categoryTitle && (
+                                        <span className="text-red-600 mr-1.5">{post.categoryTitle} /</span>
+                                    )}
+                                    {post.title}
+                                </h3>
 
-                            {/* Headline Title with Category Prefix */}
-                            <h3 className="text-base md:text-lg font-extrabold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                                {showCategory && post.categoryTitle && (
-                                    <span className="text-red-600 mr-1.5">{post.categoryTitle} /</span>
+                                {/* Excerpt Text */}
+                                {showExcerpt && post.excerpt && (
+                                    <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-2 mt-2">
+                                        {post.excerpt.replace(/<[^>]*>/g, "").trim()}
+                                    </p>
                                 )}
-                                {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
-                            </h3>
-
-                            {/* Excerpt Text */}
-                            {showExcerpt && post.excerpt && (
-                                <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-3">
-                                    {post.excerpt.replace(/<[^>]*>/g, "").trim()}
-                                </p>
-                            )}
-                        </div>
+                            </div>
+                        </a>
                     ))}
                 </div>
             )}
@@ -126,11 +141,11 @@ export function Kalbela5UI({
 }
 
 function Kalbela5CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 6;
+    const limit: number = Number(c.limit) || 6;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 
@@ -148,9 +163,12 @@ function Kalbela5CanvasPreview({ element }: { element: any }) {
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
+            imageHeightDesktop={Number(c.imageHeightDesktop) || 200}
+            imageHeightMobile={Number(c.imageHeightMobile) || 160}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -181,6 +199,8 @@ const kalbela5Element = {
             columnsDesktop: 3,
             columnsTablet: 2,
             columnsMobile: 1,
+            imageHeightDesktop: 200,
+            imageHeightMobile: 160,
             showCategory: "true",
             showExcerpt: "true",
             showDate: "true",
@@ -253,6 +273,24 @@ const kalbela5Element = {
                     render: (value: any, onChange: any) => (
                         <Section label="Columns (Mobile)">
                             <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "imageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Image Height (Desktop)">
+                            <NumberControl label="Desktop Height (px)" value={value ?? 200} onChange={onChange} min={100} max={600} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "imageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Image Height (Mobile)">
+                            <NumberControl label="Mobile Height (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
                         </Section>
                     ),
                 },

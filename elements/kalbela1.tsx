@@ -19,11 +19,13 @@ import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
 import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
+import k1Icon from "../icon/k1.png";
 
 interface Kalbela1Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
@@ -37,6 +39,7 @@ export function Kalbela1UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     columnsDesktop = 3,
     columnsTablet = 3,
     columnsMobile = 1,
@@ -75,7 +78,7 @@ export function Kalbela1UI({
     const gridClass = `${mobColsClass} ${tabColsClass} ${deskColsClass}`;
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header with Title and Tab Logic */}
             <KalbelaHeader
                 title={title}
@@ -87,42 +90,44 @@ export function Kalbela1UI({
 
             {/* 1. Main Top Featured Card (Horizontal Image Left + Blue Headline Right) */}
             {leadPost && (
-                <div className="group rounded-2xl border border-gray-200/90 bg-white p-4 md:p-5 shadow-sm hover:shadow-md transition-all">
-                    <div className="flex flex-col md:flex-row gap-5 lg:gap-7 items-stretch">
-                        <div className="w-full md:w-[58%] overflow-hidden rounded-xl bg-gray-100 aspect-16/10 shrink-0">
+                <a href={leadPost.postUrl || "#"} className="group rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all">
+                    <div className="flex flex-col md:flex-row items-stretch">
+                        <div className="w-full md:w-1/2 aspect-16/10 shrink-0">
                             <img
                                 src={leadPost.image}
                                 alt={leadPost.title}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-101"
                             />
                         </div>
-                        <div className="w-full md:w-[42%] flex flex-col justify-start gap-3 py-1">
+                        <div className="w-full md:w-1/2 flex flex-col justify-start gap-3 p-2">
                             <h2
-                                className="text-xl md:text-2xl lg:text-2xl font-bold tracking-tight text-blue-600 hover:text-blue-700 leading-snug transition-colors"
+                                className="text-xl md:text-2xl lg:text-2xl line-clamp-3 font-bold hover:text-blue-700"
                                 style={{ color: colors.title || undefined }}
                             >
-                                {showLink ? <a href={leadPost.postUrl || "#"}>{leadPost.title}</a> : leadPost.title}
+                                {leadPost.title}
                             </h2>
                             {leadPost.excerpt && (
-                                <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-4 md:line-clamp-6">
-                                    {leadPost.excerpt}
-                                </p>
+                                <div
+                                    className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-4 md:line-clamp-6"
+                                    dangerouslySetInnerHTML={{ __html: leadPost.excerpt }}
+                                />
                             )}
                         </div>
                     </div>
-                </div>
+                </a>
             )}
 
             {/* 2. Sub-Posts Grid */}
             {subPosts.length > 0 && (
                 <div className={`grid ${gridClass} gap-4 md:gap-5`}>
                     {subPosts.map((post) => (
-                        <div
+                        <a
+                            href={post.postUrl || "#"}
                             key={post._id}
-                            className="group flex flex-col gap-3 rounded-2xl border border-gray-200/90 bg-white p-3.5 shadow-sm hover:shadow-md transition-all"
+                            className="group flex flex-col rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden bg-white"
                         >
                             {post.image && (
-                                <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                <div className="aspect-16/10 w-full">
                                     <img
                                         src={post.image}
                                         alt={post.title}
@@ -130,10 +135,12 @@ export function Kalbela1UI({
                                     />
                                 </div>
                             )}
-                            <h4 className="text-sm md:text-base font-bold text-gray-900 group-hover:text-blue-600 leading-snug line-clamp-2 transition-colors">
-                                {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
-                            </h4>
-                        </div>
+                            {showLink && (
+                                <h4 className="p-2 text-sm md:text-base font-bold text-gray-900 group-hover:text-main line-clamp-2">
+                                    {post.title}
+                                </h4>
+                            )}
+                        </a>
                     ))}
                 </div>
             )}
@@ -142,11 +149,11 @@ export function Kalbela1UI({
 }
 
 function Kalbela1CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 7;
+    const limit: number = Number(c.limit) || 7;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 
@@ -185,8 +192,8 @@ function Kalbela1CanvasPreview({ element }: { element: any }) {
 const kalbela1Element = {
     type: "kalbela-1",
     category: "kalbela",
-    label: "Kalbela 1 (Top Hero Box)",
-    icon: "solar:widget-4-bold",
+    label: "Hero",
+    icon: typeof k1Icon === "string" ? k1Icon : (k1Icon as any)?.src || "solar:widget-bold",
 
     schema: {
         content: {

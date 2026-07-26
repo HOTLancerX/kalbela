@@ -19,11 +19,13 @@ import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
 import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
+import k2Icon from "../icon/k2.png";
 
 interface Kalbela2Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
@@ -38,6 +40,7 @@ export function Kalbela2UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     columnsDesktop = 1,
     columnsTablet = 1,
     columnsMobile = 1,
@@ -63,7 +66,7 @@ export function Kalbela2UI({
     const isRight = imagePosition === "right";
 
     return (
-        <div className="w-full flex flex-col gap-4 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -74,12 +77,12 @@ export function Kalbela2UI({
             />
 
             {/* Main Single Box Container */}
-            <div className="flex flex-col rounded-2xl border border-gray-200/90 bg-white p-4 shadow-sm">
+            <div className="flex flex-col">
                 {/* Top Lead News (Image Top + Bold Title Bottom) */}
                 {leadPost && (
-                    <div className="group flex flex-col gap-2.5 pb-3.5 border-b border-gray-200/80">
+                    <a href={leadPost.postUrl || "#"} className="group flex flex-col rounded-xl overflow-hidden bg-white shadow-sm mb-1">
                         {leadPost.image && (
-                            <div className="aspect-video w-full overflow-hidden rounded-xl bg-gray-100">
+                            <div className="aspect-video w-full">
                                 <img
                                     src={leadPost.image}
                                     alt={leadPost.title}
@@ -87,24 +90,25 @@ export function Kalbela2UI({
                                 />
                             </div>
                         )}
-                        <h2 className="text-lg md:text-xl font-extrabold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                            {showLink ? <a href={leadPost.postUrl || "#"}>{leadPost.title}</a> : leadPost.title}
+                        <h2 className="text-base line-clamp-2 p-2 font-extrabold text-gray-900 group-hover:text-main transition-colors">
+                            {leadPost.title}
                         </h2>
-                    </div>
+                    </a>
                 )}
 
                 {/* Vertical Thumbnail List */}
                 {listPosts.length > 0 && (
                     <div className="flex flex-col">
                         {listPosts.map((post) => (
-                            <div
+                            <a
+                                href={post.postUrl || "#"}
                                 key={post._id}
-                                className={`group flex items-center gap-3 py-3 border-b border-gray-200/80 last:border-none transition-colors ${
+                                className={`group flex items-center overflow-hidden rounded-xl bg-white transition-colors my-1.5 ${
                                     isRight ? "flex-row-reverse" : "flex-row"
                                 }`}
                             >
                                 {post.image && (
-                                    <div className="h-16 w-24 md:h-18 md:w-28 shrink-0 overflow-hidden rounded-lg bg-gray-100 aspect-16/10">
+                                    <div className="h-12 w-16 md:h-18 md:w-24 shrink-0 aspect-16/10">
                                         <img
                                             src={post.image}
                                             alt={post.title}
@@ -112,10 +116,10 @@ export function Kalbela2UI({
                                         />
                                     </div>
                                 )}
-                                <h4 className="text-sm font-bold text-gray-900 leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors flex-1">
-                                    {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                <h4 className="text-sm font-bold p-2 text-gray-900 leading-snug line-clamp-3 group-hover:text-main transition-colors flex-1">
+                                    {post.title}
                                 </h4>
-                            </div>
+                            </a>
                         ))}
                     </div>
                 )}
@@ -125,11 +129,11 @@ export function Kalbela2UI({
 }
 
 function Kalbela2CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 6;
+    const limit: number = Number(c.limit) || 6;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 
@@ -167,7 +171,7 @@ const kalbela2Element = {
     type: "kalbela-2",
     category: "kalbela",
     label: "Kalbela 2 (Lead & Vertical List)",
-    icon: "solar:widget-2-bold",
+    icon: typeof k2Icon === "string" ? k2Icon : (k2Icon as any)?.src || "solar:widget-2-bold",
 
     schema: {
         content: {
@@ -232,7 +236,7 @@ const kalbela2Element = {
                                     type="button"
                                     onClick={() => onChange("left")}
                                     className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        (value ?? "left") === "left" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
+                                        (value ?? "left") === "left" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
                                     }`}
                                 >
                                     Left
@@ -241,7 +245,7 @@ const kalbela2Element = {
                                     type="button"
                                     onClick={() => onChange("right")}
                                     className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        value === "right" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
+                                        value === "right" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
                                     }`}
                                 >
                                     Right

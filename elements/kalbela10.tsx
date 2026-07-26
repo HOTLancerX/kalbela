@@ -24,6 +24,7 @@ interface Kalbela10Props {
     title?: string;
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
+    limit?: number;
     topCount?: number;
     topColumnsDesktop?: number;
     topColumnsTablet?: number;
@@ -40,6 +41,7 @@ export function Kalbela10UI({
     title = "",
     tabs = [],
     postsByCategory = {},
+    limit,
     topCount = 3,
     topColumnsDesktop = 3,
     topColumnsTablet = 2,
@@ -165,11 +167,11 @@ export function Kalbela10UI({
 }
 
 function Kalbela10CanvasPreview({ element }: { element: any }) {
-    const c = element.schema?.content ?? {};
-    const s = element.schema?.style ?? {};
+    const c = { ...element.schema?.content, ...element.content };
+    const s = { ...element.schema?.style, ...element.style };
 
     const categoryIds: string[] = c.categoryIds ?? [];
-    const limit: number = c.limit ?? 7;
+    const limit: number = Number(c.limit) || 7;
 
     const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
 
