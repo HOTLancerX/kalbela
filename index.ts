@@ -19,6 +19,9 @@ import kalbela12Element from "@/plugin/kalbela/elements/kalbela12";
 import kalbela13Element from "@/plugin/kalbela/elements/kalbela13";
 import kalbela14Element from "@/plugin/kalbela/elements/kalbela14";
 import Headerkb from "./header/Header";
+import KalbelaBox from "./box/Box";
+import KalbelaCategoryLayout from "./category/Layout";
+import KalbelaBlogLayout from "./blog/Layout";
 
 export const PLUGINS: PluginMeta = {
     nx: "com.system.kalbela",
@@ -35,13 +38,43 @@ export function register() {
     addHook("root.pages", [
         {
             key: "header",
-            label: "Header 1",
+            label: "Header",
             type: "header",
             slug: "layout",
             style: "left",
             position: 10,
             active: true,           // first-boot default
             component: Headerkb,
+        },
+        {
+            key: "blog-box",
+            label: "Kalbela Box",
+            type: "blog-box",
+            slug: "dynamic",
+            style: "left",
+            position: 40,
+            active: true,
+            component: KalbelaBox,
+        },
+        {
+            key: "blog-category",
+            label: "Kalbela Category",
+            type: "blog-category",
+            slug: "dynamic",
+            style: "left",
+            position: 40,
+            active: true,
+            component: KalbelaCategoryLayout,
+        },
+        {
+            key: "blog",
+            label: "Kalbela Blog",
+            type: "blog",
+            slug: "dynamic",
+            style: "left",
+            position: 40,
+            active: true,
+            component: KalbelaBlogLayout,
         },
     ], PLUGINS.nx);
 

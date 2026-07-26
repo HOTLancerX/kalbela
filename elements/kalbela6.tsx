@@ -233,7 +233,7 @@ const kalbela6Element = {
     type: "kalbela-6",
     category: "kalbela",
     label: "grid 3",
-    icon: k6Icon,
+    icon: typeof k6Icon === "string" ? k6Icon : (k6Icon as any)?.src || "solar:grid-3-bold",
 
     schema: {
         content: {
