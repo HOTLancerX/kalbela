@@ -3,7 +3,7 @@
 /**
  * plugin/kalbela/elements/kalbela11.tsx
  *
- * Kalbela Element 11: Center Featured Lead Card + Left Stack + Right Stack
+ * Kalbela Element 11: Center Featured Lead Card (Sec 1) + Left Stack (Sec 2) + Right Stack (Sec 3)
  */
 
 import React, { useState, useEffect } from "react";
@@ -26,7 +26,21 @@ interface Kalbela11Props {
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
     leftCount?: number;
+    // Image Height Controls per section
+    centerImageHeightDesktop?: number;
+    centerImageHeightMobile?: number;
+    leftImageHeightDesktop?: number;
+    leftImageHeightMobile?: number;
+    rightImageHeightDesktop?: number;
+    rightImageHeightMobile?: number;
     colors?: NewsColors;
+    // Display Controls per section
+    showCenterExcerpt?: boolean;
+    showCenterCategory?: boolean;
+    showLeftExcerpt?: boolean;
+    showLeftCategory?: boolean;
+    showRightExcerpt?: boolean;
+    showRightCategory?: boolean;
     showDate?: boolean;
     showLink?: boolean;
 }
@@ -37,7 +51,19 @@ export function Kalbela11UI({
     postsByCategory = {},
     limit,
     leftCount = 2,
+    centerImageHeightDesktop = 320,
+    centerImageHeightMobile = 220,
+    leftImageHeightDesktop = 180,
+    leftImageHeightMobile = 140,
+    rightImageHeightDesktop = 180,
+    rightImageHeightMobile = 140,
     colors = {},
+    showCenterExcerpt = true,
+    showCenterCategory = false,
+    showLeftExcerpt = true,
+    showLeftCategory = true,
+    showRightExcerpt = true,
+    showRightCategory = true,
     showDate = true,
     showLink = true,
 }: Kalbela11Props) {
@@ -49,7 +75,8 @@ export function Kalbela11UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     const centerLeadPost = posts[0];
     const leftCountNum = Math.min(Number(leftCount) || 2, Math.max(0, posts.length - 1));
@@ -58,7 +85,7 @@ export function Kalbela11UI({
     const rightPosts = posts.slice(1 + leftCountNum);
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -70,14 +97,24 @@ export function Kalbela11UI({
 
             {/* 3-Column Layout (Left Stack + Center Big Lead + Right Stack) */}
             {posts.length > 0 && (
-                <div className="flex flex-col lg:flex-row gap-6 items-start">
-                    {/* Left Column Stack */}
+                <div className="flex flex-col lg:flex-row gap-4 md:gap-5 items-start">
+                    {/* Left Column Stack (Sec 2) */}
                     {leftPosts.length > 0 && (
-                        <div className="w-full lg:w-[26%] flex flex-col gap-5 lg:border-r lg:border-gray-200 lg:pr-5 order-2 lg:order-1">
+                        <div className="w-full lg:w-[26%] flex flex-col gap-4 lg:border-r lg:border-gray-200 lg:pr-5 order-2 lg:order-1">
                             {leftPosts.map((post) => (
-                                <div key={post._id} className="group flex flex-col gap-2.5">
+                                <a
+                                    key={post._id}
+                                    href={post.postUrl || "#"}
+                                    className="group flex flex-col gap-2"
+                                >
                                     {post.image && (
-                                        <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                        <div
+                                            className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                            style={{
+                                                "--h-mob": `${leftImageHeightMobile}px`,
+                                                "--h-desk": `${leftImageHeightDesktop}px`,
+                                            } as React.CSSProperties}
+                                        >
                                             <img
                                                 src={post.image}
                                                 alt={post.title}
@@ -85,19 +122,36 @@ export function Kalbela11UI({
                                             />
                                         </div>
                                     )}
-                                    <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors">
-                                        {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                    <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-main transition-colors">
+                                        {showLeftCategory && post.categoryTitle && (
+                                            <span className="text-red-600 mr-1">{post.categoryTitle} /</span>
+                                        )}
+                                        {post.title}
                                     </h4>
-                                </div>
+                                    {showLeftExcerpt && post.excerpt && (
+                                        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                            {post.excerpt.replace(/<[^>]*>/g, "").trim()}
+                                        </p>
+                                    )}
+                                </a>
                             ))}
                         </div>
                     )}
 
-                    {/* Center Featured Big Lead Card */}
+                    {/* Center Featured Big Lead Card (Sec 1) */}
                     {centerLeadPost && (
-                        <div className="w-full lg:w-[48%] group flex flex-col gap-3 order-1 lg:order-2">
+                        <a
+                            href={centerLeadPost.postUrl || "#"}
+                            className="w-full lg:w-[48%] group flex flex-col gap-3 order-1 lg:order-2"
+                        >
                             {centerLeadPost.image && (
-                                <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                <div
+                                    className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                    style={{
+                                        "--h-mob": `${centerImageHeightMobile}px`,
+                                        "--h-desk": `${centerImageHeightDesktop}px`,
+                                    } as React.CSSProperties}
+                                >
                                     <img
                                         src={centerLeadPost.image}
                                         alt={centerLeadPost.title}
@@ -105,24 +159,37 @@ export function Kalbela11UI({
                                     />
                                 </div>
                             )}
-                            <h2 className="text-lg md:text-xl font-extrabold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                                {showLink ? <a href={centerLeadPost.postUrl || "#"}>{centerLeadPost.title}</a> : centerLeadPost.title}
+                            <h2 className="text-base font-medium text-gray-900 leading-snug line-clamp-2 group-hover:text-main transition-colors">
+                                {showCenterCategory && centerLeadPost.categoryTitle && (
+                                    <span className="text-red-600 mr-1.5">{centerLeadPost.categoryTitle} /</span>
+                                )}
+                                {centerLeadPost.title}
                             </h2>
-                            {centerLeadPost.excerpt && (
+                            {showCenterExcerpt && centerLeadPost.excerpt && (
                                 <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-4">
                                     {centerLeadPost.excerpt.replace(/<[^>]*>/g, "").trim()}
                                 </p>
                             )}
-                        </div>
+                        </a>
                     )}
 
-                    {/* Right Column Stack */}
+                    {/* Right Column Stack (Sec 3) */}
                     {rightPosts.length > 0 && (
-                        <div className="w-full lg:w-[26%] flex flex-col gap-5 lg:border-l lg:border-gray-200 lg:pl-5 order-3 lg:order-3">
+                        <div className="w-full lg:w-[26%] flex flex-col gap-4 lg:border-l lg:border-gray-200 lg:pl-5 order-3 lg:order-3">
                             {rightPosts.map((post) => (
-                                <div key={post._id} className="group flex flex-col gap-2.5">
+                                <a
+                                    key={post._id}
+                                    href={post.postUrl || "#"}
+                                    className="group flex flex-col gap-2"
+                                >
                                     {post.image && (
-                                        <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                        <div
+                                            className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                            style={{
+                                                "--h-mob": `${rightImageHeightMobile}px`,
+                                                "--h-desk": `${rightImageHeightDesktop}px`,
+                                            } as React.CSSProperties}
+                                        >
                                             <img
                                                 src={post.image}
                                                 alt={post.title}
@@ -130,10 +197,18 @@ export function Kalbela11UI({
                                             />
                                         </div>
                                     )}
-                                    <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors">
-                                        {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                    <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-main transition-colors">
+                                        {showRightCategory && post.categoryTitle && (
+                                            <span className="text-red-600 mr-1">{post.categoryTitle} /</span>
+                                        )}
+                                        {post.title}
                                     </h4>
-                                </div>
+                                    {showRightExcerpt && post.excerpt && (
+                                        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                            {post.excerpt.replace(/<[^>]*>/g, "").trim()}
+                                        </p>
+                                    )}
+                                </a>
                             ))}
                         </div>
                     )}
@@ -166,7 +241,14 @@ function Kalbela11CanvasPreview({ element }: { element: any }) {
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             leftCount={Number(c.leftCount) || 2}
+            centerImageHeightDesktop={Number(c.centerImageHeightDesktop) || 320}
+            centerImageHeightMobile={Number(c.centerImageHeightMobile) || 220}
+            leftImageHeightDesktop={Number(c.leftImageHeightDesktop) || 180}
+            leftImageHeightMobile={Number(c.leftImageHeightMobile) || 140}
+            rightImageHeightDesktop={Number(c.rightImageHeightDesktop) || 180}
+            rightImageHeightMobile={Number(c.rightImageHeightMobile) || 140}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -175,6 +257,12 @@ function Kalbela11CanvasPreview({ element }: { element: any }) {
                 title: s.titleColor || "",
                 titleHover: s.titleHoverColor || "",
             }}
+            showCenterExcerpt={c.showCenterExcerpt !== "false"}
+            showCenterCategory={c.showCenterCategory === "true"}
+            showLeftExcerpt={c.showLeftExcerpt !== "false"}
+            showLeftCategory={c.showLeftCategory !== "false"}
+            showRightExcerpt={c.showRightExcerpt !== "false"}
+            showRightCategory={c.showRightCategory !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -193,6 +281,18 @@ const kalbela11Element = {
             categoryIds: [] as string[],
             limit: 5,
             leftCount: 2,
+            centerImageHeightDesktop: 320,
+            centerImageHeightMobile: 220,
+            leftImageHeightDesktop: 180,
+            leftImageHeightMobile: 140,
+            rightImageHeightDesktop: 180,
+            rightImageHeightMobile: 140,
+            showCenterExcerpt: "true",
+            showCenterCategory: "false",
+            showLeftExcerpt: "true",
+            showLeftCategory: "true",
+            showRightExcerpt: "true",
+            showRightCategory: "true",
             showDate: "true",
             showLink: "true",
         },
@@ -216,7 +316,7 @@ const kalbela11Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
+                        <Section label="Title" defaultOpen>
                             <Text label="Title" value={value ?? ""} onChange={onChange} />
                         </Section>
                     ),
@@ -234,8 +334,8 @@ const kalbela11Element = {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 5} onChange={onChange} min={3} max={20} />
+                        <Section label="Limit">
+                            <NumberControl label="Total Limit" value={value ?? 5} onChange={onChange} min={3} max={20} />
                         </Section>
                     ),
                 },
@@ -243,8 +343,116 @@ const kalbela11Element = {
                     name: "leftCount",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Section Post Count">
+                        <Section label="Left Count">
                             <NumberControl label="Left Count" value={value ?? 2} onChange={onChange} min={1} max={5} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "centerImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Center Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 320} onChange={onChange} min={100} max={700} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "centerImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Center Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 220} onChange={onChange} min={80} max={500} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leftImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={80} max={500} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leftImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={60} max={400} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "rightImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={80} max={500} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "rightImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={60} max={400} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showCenterExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Center Display">
+                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showLeftExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Display">
+                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showRightExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Display">
+                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showCenterCategory",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Center Display">
+                            <Toggle label="Show Category" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showLeftCategory",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Display">
+                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showRightCategory",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Display">
+                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                         </Section>
                     ),
                 },

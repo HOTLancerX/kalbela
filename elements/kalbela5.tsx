@@ -253,8 +253,8 @@ const kalbela5Element = {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 3} onChange={onChange} min={2} max={6} />
+                        <Section label="Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 3} onChange={onChange} min={2} max={6} />
                         </Section>
                     ),
                 },
@@ -262,8 +262,8 @@ const kalbela5Element = {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 2} onChange={onChange} min={1} max={4} />
+                        <Section label="Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={4} />
                         </Section>
                     ),
                 },
@@ -271,8 +271,8 @@ const kalbela5Element = {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        <Section label="Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
                         </Section>
                     ),
                 },
@@ -280,8 +280,8 @@ const kalbela5Element = {
                     name: "imageHeightDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Image Height (Desktop)">
-                            <NumberControl label="Desktop Height (px)" value={value ?? 200} onChange={onChange} min={100} max={600} />
+                        <Section label="Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 200} onChange={onChange} min={100} max={600} />
                         </Section>
                     ),
                 },
@@ -289,8 +289,8 @@ const kalbela5Element = {
                     name: "imageHeightMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Image Height (Mobile)">
-                            <NumberControl label="Mobile Height (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
+                        <Section label="Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
                         </Section>
                     ),
                 },

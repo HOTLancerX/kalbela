@@ -3,7 +3,7 @@
 /**
  * plugin/kalbela/elements/kalbela14.tsx
  *
- * Kalbela Element 14: Photo Embla Carousel / Slider with Custom Desktop/Mobile Heights
+ * Kalbela Element 14: Photo Embla Carousel / Slider with Custom Desktop/Mobile Heights & Overlay Info
  */
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -31,6 +31,8 @@ interface Kalbela14Props {
     columnsMobile?: number;
     imageHeightDesktop?: number;
     imageHeightMobile?: number;
+    showCategory?: boolean;
+    showExcerpt?: boolean;
     showGalleryIcon?: boolean;
     colors?: NewsColors & {
         overlayTitleColor?: string;
@@ -66,7 +68,9 @@ export function Kalbela14UI({
     columnsMobile = 1,
     imageHeightDesktop = 240,
     imageHeightMobile = 180,
-    showGalleryIcon = false,
+    showCategory = true,
+    showExcerpt = false,
+    showGalleryIcon = true,
     colors = {},
     showDate = true,
     showLink = true,
@@ -79,7 +83,8 @@ export function Kalbela14UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: "start",
@@ -99,7 +104,7 @@ export function Kalbela14UI({
     const slideFlexClass = getEmblaSlideFlexClass(columnsDesktop, columnsTablet, columnsMobile);
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -139,12 +144,19 @@ export function Kalbela14UI({
                                     className={`min-w-0 pr-4 shrink-0 ${slideFlexClass}`}
                                 >
                                     <div
-                                        className="relative overflow-hidden rounded-2xl group bg-gray-900 shadow-xs hover:shadow-xl transition-all w-full h-[var(--h-mob)] md:h-[var(--h-desk)]"
+                                        className="relative overflow-hidden rounded-2xl group bg-gray-900 shadow-xs hover:shadow-xl transition-all w-full h-(--h-mob) md:h-(--h-desk)"
                                         style={{
                                             "--h-mob": `${imageHeightMobile}px`,
                                             "--h-desk": `${imageHeightDesktop}px`,
                                         } as React.CSSProperties}
                                     >
+                                        {/* Gallery Camera Icon Badge */}
+                                        {showGalleryIcon && (
+                                            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-xs text-white p-1.5 rounded-full z-10 flex items-center justify-center">
+                                                <Icon icon="solar:camera-bold" width={16} height={16} />
+                                            </div>
+                                        )}
+
                                         {/* Card Image */}
                                         {post.image && (
                                             <img
@@ -155,10 +167,15 @@ export function Kalbela14UI({
                                         )}
 
                                         {/* Bottom Dark Gradient Banner Overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-4">
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-3.5 md:p-4">
+                                            {showCategory && post.categoryTitle && (
+                                                <span className="text-xs font-semibold text-red-500 mb-1">
+                                                    {post.categoryTitle}
+                                                </span>
+                                            )}
                                             <h3
-                                                className="text-base md:text-lg font-extrabold leading-snug line-clamp-2 drop-shadow-md transition-colors"
-                                                style={{ color: colors.overlayTitleColor || "#fbbf24" }}
+                                                className="text-sm md:text-base font-bold leading-snug line-clamp-2 drop-shadow-md transition-colors"
+                                                style={{ color: colors.overlayTitleColor || "#ffffff" }}
                                             >
                                                 {showLink ? (
                                                     <a href={post.postUrl || "#"} className="hover:underline">
@@ -168,11 +185,10 @@ export function Kalbela14UI({
                                                     post.title
                                                 )}
                                             </h3>
-
-                                            {showGalleryIcon && (
-                                                <div className="absolute bottom-3 right-3 text-white/80">
-                                                    <Icon icon="solar:gallery-wide-bold" width={24} />
-                                                </div>
+                                            {showExcerpt && post.excerpt && (
+                                                <p className="text-xs text-gray-300 leading-relaxed line-clamp-2 mt-1 opacity-90">
+                                                    {post.excerpt.replace(/<[^>]*>/g, "").trim()}
+                                                </p>
                                             )}
                                         </div>
                                     </div>
@@ -209,12 +225,15 @@ function Kalbela14CanvasPreview({ element }: { element: any }) {
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
             imageHeightDesktop={Number(c.imageHeightDesktop) || 240}
             imageHeightMobile={Number(c.imageHeightMobile) || 180}
-            showGalleryIcon={c.showGalleryIcon === "true"}
+            showCategory={c.showCategory !== "false"}
+            showExcerpt={c.showExcerpt === "true"}
+            showGalleryIcon={c.showGalleryIcon !== "false"}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -222,7 +241,7 @@ function Kalbela14CanvasPreview({ element }: { element: any }) {
                 inactiveText: s.inactiveTabTextColor || "",
                 title: s.titleColor || "",
                 titleHover: s.titleHoverColor || "",
-                overlayTitleColor: s.overlayTitleColor || "#fbbf24",
+                overlayTitleColor: s.overlayTitleColor || "#ffffff",
             }}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
@@ -246,14 +265,16 @@ const kalbela14Element = {
             columnsMobile: 1,
             imageHeightDesktop: 240,
             imageHeightMobile: 180,
-            showGalleryIcon: "false",
+            showCategory: "true",
+            showExcerpt: "false",
+            showGalleryIcon: "true",
             showDate: "true",
             showLink: "true",
         },
         style: {
             titleColor: "",
             titleHoverColor: "",
-            overlayTitleColor: "#fbbf24",
+            overlayTitleColor: "#ffffff",
             activeTabColor: "#2563eb",
             activeTabTextColor: "#ffffff",
             inactiveTabColor: "",
@@ -271,7 +292,7 @@ const kalbela14Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
+                        <Section label="Title" defaultOpen>
                             <Text label="Title" value={value ?? ""} onChange={onChange} />
                         </Section>
                     ),
@@ -289,8 +310,8 @@ const kalbela14Element = {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 8} onChange={onChange} min={1} max={30} />
+                        <Section label="Limit">
+                            <NumberControl label="Total Limit" value={value ?? 8} onChange={onChange} min={1} max={30} />
                         </Section>
                     ),
                 },
@@ -298,8 +319,8 @@ const kalbela14Element = {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 4} onChange={onChange} min={1} max={6} />
+                        <Section label="Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 4} onChange={onChange} min={1} max={6} />
                         </Section>
                     ),
                 },
@@ -307,8 +328,8 @@ const kalbela14Element = {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 2} onChange={onChange} min={1} max={4} />
+                        <Section label="Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={4} />
                         </Section>
                     ),
                 },
@@ -316,8 +337,8 @@ const kalbela14Element = {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        <Section label="Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
                         </Section>
                     ),
                 },
@@ -325,8 +346,8 @@ const kalbela14Element = {
                     name: "imageHeightDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Card Height Desktop (px)">
-                            <NumberControl label="Height (px)" value={value ?? 240} onChange={onChange} min={120} max={500} />
+                        <Section label="Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 240} onChange={onChange} min={120} max={500} />
                         </Section>
                     ),
                 },
@@ -334,8 +355,26 @@ const kalbela14Element = {
                     name: "imageHeightMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Card Height Mobile (px)">
-                            <NumberControl label="Height (px)" value={value ?? 180} onChange={onChange} min={100} max={350} />
+                        <Section label="Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={100} max={350} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showCategory",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Display">
+                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Display">
+                            <Toggle label="Show Excerpt" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                         </Section>
                     ),
                 },
@@ -344,7 +383,16 @@ const kalbela14Element = {
                     responsive: false,
                     render: (value: any, onChange: any) => (
                         <Section label="Display">
-                            <Toggle label="Show Gallery Icon" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                            <Toggle label="Show Gallery Icon" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showDate",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Display">
+                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                         </Section>
                     ),
                 },
@@ -359,7 +407,7 @@ const kalbela14Element = {
                     responsive: false,
                     render: (value: any, onChange: any) => (
                         <Section label="Overlay Title Color" defaultOpen>
-                            <ColorPickerPopup label="Title Color" value={value ?? "#fbbf24"} onChange={onChange} />
+                            <ColorPickerPopup label="Title Color" value={value ?? "#ffffff"} onChange={onChange} />
                         </Section>
                     ),
                 },

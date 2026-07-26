@@ -30,7 +30,12 @@ interface Kalbela8Props {
     leadCount?: number;
     leftImagePosition?: "left" | "right";
     rightImagePosition?: "left" | "right";
+    leadImageHeightDesktop?: number;
+    leadImageHeightMobile?: number;
+    subImageHeightDesktop?: number;
+    subImageHeightMobile?: number;
     colors?: NewsColors;
+    showExcerpt?: boolean;
     showDate?: boolean;
     showLink?: boolean;
 }
@@ -43,7 +48,12 @@ export function Kalbela8UI({
     leadCount = 2,
     leftImagePosition = "left",
     rightImagePosition = "right",
+    leadImageHeightDesktop = 200,
+    leadImageHeightMobile = 160,
+    subImageHeightDesktop = 80,
+    subImageHeightMobile = 64,
     colors = {},
+    showExcerpt = true,
     showDate = true,
     showLink = true,
 }: Kalbela8Props) {
@@ -55,14 +65,15 @@ export function Kalbela8UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     const leadCountNum = Math.min(Number(leadCount) || 2, posts.length);
     const leadPosts = posts.slice(0, leadCountNum);
     const rightPosts = posts.slice(leadCountNum);
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -74,19 +85,26 @@ export function Kalbela8UI({
 
             {/* Split Content Section */}
             {posts.length > 0 && (
-                <div className="flex flex-col lg:flex-row gap-6 items-start">
+                <div className="flex flex-col lg:flex-row gap-2 md:gap-4 items-start">
                     {/* Left Column (Primary Lead Cards) */}
                     {leadPosts.length > 0 && (
-                        <div className="w-full lg:w-[60%] flex flex-col gap-6 lg:border-r lg:border-gray-200 lg:pr-6">
+                        <div className="w-full lg:w-[60%] flex flex-col gap-2 md:gap-4 lg:border-r lg:border-gray-200 lg:pr-5">
                             {leadPosts.map((post) => (
-                                <div
+                                <a
                                     key={post._id}
-                                    className={`group flex flex-col md:flex-row gap-4 items-stretch border-b border-gray-100 pb-5 last:border-none last:pb-0 ${
+                                    href={post.postUrl || "#"}
+                                    className={`group flex flex-col md:flex-row gap-2 md:gap-4 items-stretch border-b border-gray-100 pb-4 md:pb-5 last:border-none last:pb-0 ${
                                         leftImagePosition === "right" ? "md:flex-row-reverse" : ""
                                     }`}
                                 >
                                     {post.image && (
-                                        <div className="w-full md:w-[48%] overflow-hidden rounded-xl bg-gray-100 aspect-16/10 shrink-0">
+                                        <div
+                                            className="w-full md:w-[48%] overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                            style={{
+                                                "--h-mob": `${leadImageHeightMobile}px`,
+                                                "--h-desk": `${leadImageHeightDesktop}px`,
+                                            } as React.CSSProperties}
+                                        >
                                             <img
                                                 src={post.image}
                                                 alt={post.title}
@@ -95,32 +113,39 @@ export function Kalbela8UI({
                                         </div>
                                     )}
                                     <div className="w-full md:w-[52%] flex flex-col gap-2 justify-start py-0.5">
-                                        <h3 className="text-base md:text-lg font-extrabold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                                            {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                        <h3 className="text-base font-medium text-gray-900 leading-snug group-hover:text-main line-clamp-2 transition-colors">
+                                            {post.title}
                                         </h3>
-                                        {post.excerpt && (
+                                        {showExcerpt && post.excerpt && (
                                             <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-3">
                                                 {post.excerpt.replace(/<[^>]*>/g, "").trim()}
                                             </p>
                                         )}
                                     </div>
-                                </div>
+                                </a>
                             ))}
                         </div>
                     )}
 
                     {/* Right Column (Secondary Thumbnail Cards) */}
                     {rightPosts.length > 0 && (
-                        <div className="w-full lg:w-[40%] flex flex-col gap-5">
+                        <div className="w-full lg:w-[40%] flex flex-col gap-3 md:gap-4">
                             {rightPosts.map((post) => (
-                                <div
+                                <a
                                     key={post._id}
-                                    className={`group flex items-center gap-3 border-b border-gray-100 pb-4 last:border-none last:pb-0 ${
+                                    href={post.postUrl || "#"}
+                                    className={`group flex items-center gap-3 border-b border-gray-100 pb-3 md:pb-4 last:border-none last:pb-0 ${
                                         rightImagePosition === "left" ? "flex-row" : "flex-row-reverse"
                                     }`}
                                 >
                                     {post.image && (
-                                        <div className="h-16 w-24 md:h-18 md:w-28 shrink-0 overflow-hidden rounded-lg bg-gray-100 aspect-16/10">
+                                        <div
+                                            className="w-24 md:w-28 shrink-0 overflow-hidden rounded-lg bg-gray-100 h-(--h-mob) md:h-(--h-desk)"
+                                            style={{
+                                                "--h-mob": `${subImageHeightMobile}px`,
+                                                "--h-desk": `${subImageHeightDesktop}px`,
+                                            } as React.CSSProperties}
+                                        >
                                             <img
                                                 src={post.image}
                                                 alt={post.title}
@@ -129,16 +154,16 @@ export function Kalbela8UI({
                                         </div>
                                     )}
                                     <div className="flex flex-col gap-1 flex-1">
-                                        <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
-                                            {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                        <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-main transition-colors">
+                                            {post.title}
                                         </h4>
-                                        {post.excerpt && (
+                                        {showExcerpt && post.excerpt && (
                                             <p className="text-[11px] text-gray-500 leading-normal line-clamp-2">
                                                 {post.excerpt.replace(/<[^>]*>/g, "").trim()}
                                             </p>
                                         )}
                                     </div>
-                                </div>
+                                </a>
                             ))}
                         </div>
                     )}
@@ -171,9 +196,14 @@ function Kalbela8CanvasPreview({ element }: { element: any }) {
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             leadCount={Number(c.leadCount) || 2}
             leftImagePosition={c.leftImagePosition || "left"}
             rightImagePosition={c.rightImagePosition || "right"}
+            leadImageHeightDesktop={Number(c.leadImageHeightDesktop) || 200}
+            leadImageHeightMobile={Number(c.leadImageHeightMobile) || 160}
+            subImageHeightDesktop={Number(c.subImageHeightDesktop) || 80}
+            subImageHeightMobile={Number(c.subImageHeightMobile) || 64}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -182,6 +212,7 @@ function Kalbela8CanvasPreview({ element }: { element: any }) {
                 title: s.titleColor || "",
                 titleHover: s.titleHoverColor || "",
             }}
+            showExcerpt={c.showExcerpt !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -202,6 +233,11 @@ const kalbela8Element = {
             leadCount: 2,
             leftImagePosition: "left",
             rightImagePosition: "right",
+            leadImageHeightDesktop: 200,
+            leadImageHeightMobile: 160,
+            subImageHeightDesktop: 80,
+            subImageHeightMobile: 64,
+            showExcerpt: "true",
             showDate: "true",
             showLink: "true",
         },
@@ -310,6 +346,51 @@ const kalbela8Element = {
                                     Right
                                 </button>
                             </div>
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leadImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Lead Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 200} onChange={onChange} min={100} max={600} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leadImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Lead Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "subImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sub Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 80} onChange={onChange} min={40} max={300} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "subImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sub Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 64} onChange={onChange} min={30} max={200} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Display">
+                            <Toggle label="Show Excerpt Text" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                         </Section>
                     ),
                 },

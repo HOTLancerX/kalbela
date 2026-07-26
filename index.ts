@@ -3,6 +3,7 @@
  */
 
 import { addBuilderElement, addHook, type PluginMeta } from "@/hook";
+import kalbelaElement from "@/plugin/kalbela/elements/kalbela";
 import kalbela1Element from "@/plugin/kalbela/elements/kalbela1";
 import kalbela2Element from "@/plugin/kalbela/elements/kalbela2";
 import kalbela3Element from "@/plugin/kalbela/elements/kalbela3";
@@ -44,6 +45,7 @@ export function register() {
         },
     ], PLUGINS.nx);
 
+    addBuilderElement(kalbelaElement, PLUGINS.nx);
     addBuilderElement(kalbela1Element, PLUGINS.nx);
     addBuilderElement(kalbela2Element, PLUGINS.nx);
     addBuilderElement(kalbela3Element, PLUGINS.nx);

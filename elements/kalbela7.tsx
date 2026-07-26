@@ -28,8 +28,13 @@ interface Kalbela7Props {
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
+    leadImageHeightDesktop?: number;
+    leadImageHeightMobile?: number;
+    subImageHeightDesktop?: number;
+    subImageHeightMobile?: number;
     colors?: NewsColors;
     showCategory?: boolean;
+    showExcerpt?: boolean;
     showDate?: boolean;
     showLink?: boolean;
 }
@@ -42,8 +47,13 @@ export function Kalbela7UI({
     columnsDesktop = 3,
     columnsTablet = 2,
     columnsMobile = 1,
+    leadImageHeightDesktop = 320,
+    leadImageHeightMobile = 220,
+    subImageHeightDesktop = 180,
+    subImageHeightMobile = 140,
     colors = {},
     showCategory = true,
+    showExcerpt = true,
     showDate = true,
     showLink = true,
 }: Kalbela7Props) {
@@ -55,18 +65,19 @@ export function Kalbela7UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     const leadPost = posts[0];
     const subPosts = posts.slice(1);
 
     const deskColsClass =
         columnsDesktop === 4 ? "lg:grid-cols-4" :
-        columnsDesktop === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3";
+            columnsDesktop === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3";
 
     const tabColsClass =
         columnsTablet === 3 ? "md:grid-cols-3" :
-        columnsTablet === 1 ? "md:grid-cols-1" : "md:grid-cols-2";
+            columnsTablet === 1 ? "md:grid-cols-1" : "md:grid-cols-2";
 
     const mobColsClass =
         columnsMobile === 2 ? "grid-cols-2" : "grid-cols-1";
@@ -74,7 +85,7 @@ export function Kalbela7UI({
     const subGridClass = `${mobColsClass} ${tabColsClass} ${deskColsClass}`;
 
     return (
-        <div className="w-full flex flex-col gap-4 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -86,12 +97,18 @@ export function Kalbela7UI({
 
             {/* Content Container (Left Big Lead + Right Sub-grid) */}
             {posts.length > 0 && (
-                <div className="flex flex-col lg:flex-row gap-6 items-start">
+                <div className="flex flex-col lg:flex-row gap-2 items-start">
                     {/* Left Fixed Big Featured Lead Card */}
                     {leadPost && (
-                        <div className="w-full lg:w-[36%] shrink-0 group flex flex-col gap-3 lg:border-r lg:border-gray-200 lg:pr-5">
+                        <a href={leadPost.postUrl || "#"} className="w-full lg:w-[36%] shrink-0 group flex flex-col gap-3 lg:border-r lg:border-gray-200 lg:pr-5">
                             {leadPost.image && (
-                                <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                <div
+                                    className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                    style={{
+                                        "--h-mob": `${leadImageHeightMobile}px`,
+                                        "--h-desk": `${leadImageHeightDesktop}px`,
+                                    } as React.CSSProperties}
+                                >
                                     <img
                                         src={leadPost.image}
                                         alt={leadPost.title}
@@ -99,11 +116,11 @@ export function Kalbela7UI({
                                     />
                                 </div>
                             )}
-                            <h2 className="text-lg md:text-xl font-extrabold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                                {showLink ? <a href={leadPost.postUrl || "#"}>{leadPost.title}</a> : leadPost.title}
+                            <h2 className="text-base font-medium text-gray-900 line-clamp-2 group-hover:text-main transition-colors">
+                                {leadPost.title}
                             </h2>
-                            {leadPost.excerpt && (
-                                <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-4">
+                            {showExcerpt && leadPost.excerpt && (
+                                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
                                     {leadPost.excerpt.replace(/<[^>]*>/g, "").trim()}
                                 </p>
                             )}
@@ -115,7 +132,7 @@ export function Kalbela7UI({
                                     </span>
                                 </div>
                             )}
-                        </div>
+                        </a>
                     )}
 
                     {/* Right Sub-Posts Grid */}
@@ -127,7 +144,13 @@ export function Kalbela7UI({
                                     className="group flex flex-col gap-2.5"
                                 >
                                     {post.image && (
-                                        <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                        <div
+                                            className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                            style={{
+                                                "--h-mob": `${subImageHeightMobile}px`,
+                                                "--h-desk": `${subImageHeightDesktop}px`,
+                                            } as React.CSSProperties}
+                                        >
                                             <img
                                                 src={post.image}
                                                 alt={post.title}
@@ -174,9 +197,14 @@ function Kalbela7CanvasPreview({ element }: { element: any }) {
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
+            leadImageHeightDesktop={Number(c.leadImageHeightDesktop) || 320}
+            leadImageHeightMobile={Number(c.leadImageHeightMobile) || 220}
+            subImageHeightDesktop={Number(c.subImageHeightDesktop) || 180}
+            subImageHeightMobile={Number(c.subImageHeightMobile) || 140}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -186,6 +214,7 @@ function Kalbela7CanvasPreview({ element }: { element: any }) {
                 titleHover: s.titleHoverColor || "",
             }}
             showCategory={c.showCategory !== "false"}
+            showExcerpt={c.showExcerpt !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -206,7 +235,12 @@ const kalbela7Element = {
             columnsDesktop: 3,
             columnsTablet: 2,
             columnsMobile: 1,
+            leadImageHeightDesktop: 320,
+            leadImageHeightMobile: 220,
+            subImageHeightDesktop: 180,
+            subImageHeightMobile: 140,
             showCategory: "true",
+            showExcerpt: "true",
             showDate: "true",
             showLink: "true",
         },
@@ -257,8 +291,8 @@ const kalbela7Element = {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Grid Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 3} onChange={onChange} min={2} max={4} />
+                        <Section label="Sub Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 3} onChange={onChange} min={2} max={4} />
                         </Section>
                     ),
                 },
@@ -266,8 +300,8 @@ const kalbela7Element = {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Grid Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 2} onChange={onChange} min={1} max={3} />
+                        <Section label="Sub Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
                         </Section>
                     ),
                 },
@@ -275,8 +309,44 @@ const kalbela7Element = {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Grid Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        <Section label="Sub Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leadImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Lead Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 320} onChange={onChange} min={100} max={700} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leadImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Lead Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 220} onChange={onChange} min={80} max={500} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "subImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sub Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={80} max={500} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "subImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sub Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={60} max={400} />
                         </Section>
                     ),
                 },
@@ -286,6 +356,15 @@ const kalbela7Element = {
                     render: (value: any, onChange: any) => (
                         <Section label="Display">
                             <Toggle label="Show Category Prefix" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Display">
+                            <Toggle label="Show Excerpt Text" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                         </Section>
                     ),
                 },

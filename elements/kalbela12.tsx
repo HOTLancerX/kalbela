@@ -49,7 +49,8 @@ export function Kalbela12UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     // Main Stage Embla Carousel
     const [emblaMainRef, emblaMainApi] = useEmblaCarousel({

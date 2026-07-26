@@ -22,6 +22,7 @@ import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
 import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
+import k6Icon from "../icon/k6.png";
 
 interface Kalbela6Props {
     title?: string;
@@ -67,11 +68,11 @@ export function Kalbela6UI({
 
     const deskColsClass =
         columnsDesktop === 4 ? "lg:grid-cols-4" :
-        columnsDesktop === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3";
+            columnsDesktop === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3";
 
     const tabColsClass =
         columnsTablet === 3 ? "md:grid-cols-3" :
-        columnsTablet === 1 ? "md:grid-cols-1" : "md:grid-cols-2";
+            columnsTablet === 1 ? "md:grid-cols-1" : "md:grid-cols-2";
 
     const mobColsClass =
         columnsMobile === 2 ? "grid-cols-2" : "grid-cols-1";
@@ -231,8 +232,8 @@ function Kalbela6CanvasPreview({ element }: { element: any }) {
 const kalbela6Element = {
     type: "kalbela-6",
     category: "kalbela",
-    label: "Kalbela 6 (3-Column Composite Section)",
-    icon: "solar:layout-3-bold",
+    label: "grid 3",
+    icon: k6Icon,
 
     schema: {
         content: {

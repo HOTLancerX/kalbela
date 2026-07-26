@@ -6,6 +6,7 @@
 
 import { registerBuilderElement } from "@/hook/builderDataHooks";
 import { fetchEnrichedBuilderData } from "@/lib/builderDataEngine";
+import { KalbelaUI } from "../elements/kalbela";
 import { Kalbela1UI } from "../elements/kalbela1";
 import { Kalbela2UI } from "../elements/kalbela2";
 import { Kalbela3UI } from "../elements/kalbela3";
@@ -33,12 +34,58 @@ async function getEnrichedData(categoryIds?: string[], limit: number = 12) {
     }
 }
 
+function filterPostsByLimit(postsByCategory?: Record<string, any[]>, limit?: number) {
+    if (!postsByCategory || !limit) return postsByCategory ?? {};
+    const result: Record<string, any[]> = {};
+    for (const catId in postsByCategory) {
+        result[catId] = (postsByCategory[catId] ?? []).slice(0, Number(limit));
+    }
+    return result;
+}
+
+// Register kalbela (Breaking News Ticker)
+registerBuilderElement("kalbela", async (schema, data) => {
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+    const limit = c.limit ? Number(c.limit) : 10;
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
+
+    return (
+        <KalbelaUI
+            title={c.title ?? "শিরোনাম"}
+            tabs={tabs}
+            postsByCategory={postsByCategory}
+            limit={limit}
+            speed={Number(c.speed) || 35}
+            tickerStyle={c.tickerStyle || "marquee"}
+            autoplay={c.autoplay !== "false"}
+            showControls={c.showControls !== "false"}
+            showCategory={c.showCategory !== "false"}
+            showDate={c.showDate === "true"}
+            showLink={c.showLink !== "false"}
+            colors={{
+                tickerBgColor: s.tickerBgColor || "#f8fafc",
+                titleBgColor: s.titleBgColor || "#dc2626",
+                titleTextColor: s.titleTextColor || "#ffffff",
+                newsTextColor: s.newsTextColor || "#1e293b",
+                newsHoverTextColor: s.newsHoverTextColor || "#dc2626",
+                controlBgColor: s.controlBgColor || "#ffffff",
+                controlIconColor: s.controlIconColor || "#475569",
+            }}
+        />
+    );
+});
+
 // Register kalbela-1
 registerBuilderElement("kalbela-1", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 7;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela1UI
@@ -66,13 +113,16 @@ registerBuilderElement("kalbela-2", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 6;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela2UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             imagePosition={c.imagePosition || "left"}
             colors={{
                 active: s.activeTabColor || "#2563eb",
@@ -91,13 +141,16 @@ registerBuilderElement("kalbela-3", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 8;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela3UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 3}
             columnsMobile={Number(c.columnsMobile) || 1}
@@ -118,13 +171,16 @@ registerBuilderElement("kalbela-4", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 9;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela4UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             itemsPerSlide={Number(c.itemsPerSlide) || 3}
             excerptLimit={Number(c.excerptLimit) || 120}
             colors={{
@@ -145,7 +201,9 @@ registerBuilderElement("kalbela-5", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 6;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela5UI
@@ -176,13 +234,16 @@ registerBuilderElement("kalbela-6", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 11;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela6UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
@@ -202,22 +263,30 @@ registerBuilderElement("kalbela-7", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 7;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela7UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
+            leadImageHeightDesktop={Number(c.leadImageHeightDesktop) || 320}
+            leadImageHeightMobile={Number(c.leadImageHeightMobile) || 220}
+            subImageHeightDesktop={Number(c.subImageHeightDesktop) || 180}
+            subImageHeightMobile={Number(c.subImageHeightMobile) || 140}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
                 title: s.titleColor || "",
             }}
             showCategory={c.showCategory !== "false"}
+            showExcerpt={c.showExcerpt !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -229,21 +298,29 @@ registerBuilderElement("kalbela-8", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 5;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela8UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             leadCount={Number(c.leadCount) || 2}
             leftImagePosition={c.leftImagePosition || "left"}
             rightImagePosition={c.rightImagePosition || "right"}
+            leadImageHeightDesktop={Number(c.leadImageHeightDesktop) || 200}
+            leadImageHeightMobile={Number(c.leadImageHeightMobile) || 160}
+            subImageHeightDesktop={Number(c.subImageHeightDesktop) || 80}
+            subImageHeightMobile={Number(c.subImageHeightMobile) || 64}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
                 title: s.titleColor || "",
             }}
+            showExcerpt={c.showExcerpt !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -255,16 +332,26 @@ registerBuilderElement("kalbela-9", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 7;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela9UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
+            topSubCount={Number(c.topSubCount) || 2}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
+            leadImageHeightDesktop={Number(c.leadImageHeightDesktop) || 220}
+            leadImageHeightMobile={Number(c.leadImageHeightMobile) || 160}
+            topSubImageHeightDesktop={Number(c.topSubImageHeightDesktop) || 180}
+            topSubImageHeightMobile={Number(c.topSubImageHeightMobile) || 140}
+            bottomImageHeightDesktop={Number(c.bottomImageHeightDesktop) || 160}
+            bottomImageHeightMobile={Number(c.bottomImageHeightMobile) || 120}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -273,6 +360,12 @@ registerBuilderElement("kalbela-9", async (schema, data) => {
                 leadTitle: s.leadTitleColor || "#fbbf24",
                 leadText: s.leadTextColor || "#d1d5db",
             }}
+            showLeadExcerpt={c.showLeadExcerpt !== "false"}
+            showLeadCategory={c.showLeadCategory === "true"}
+            showTopSubExcerpt={c.showTopSubExcerpt !== "false"}
+            showTopSubCategory={c.showTopSubCategory !== "false"}
+            showBottomExcerpt={c.showBottomExcerpt !== "false"}
+            showBottomCategory={c.showBottomCategory !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -284,13 +377,16 @@ registerBuilderElement("kalbela-10", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 7;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela10UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             topCount={Number(c.topCount) || 3}
             topColumnsDesktop={Number(c.topColumnsDesktop) || 3}
             topColumnsTablet={Number(c.topColumnsTablet) || 2}
@@ -298,11 +394,19 @@ registerBuilderElement("kalbela-10", async (schema, data) => {
             bottomColumnsDesktop={Number(c.bottomColumnsDesktop) || 4}
             bottomColumnsTablet={Number(c.bottomColumnsTablet) || 2}
             bottomColumnsMobile={Number(c.bottomColumnsMobile) || 1}
+            topImageHeightDesktop={Number(c.topImageHeightDesktop) || 200}
+            topImageHeightMobile={Number(c.topImageHeightMobile) || 160}
+            bottomImageHeightDesktop={Number(c.bottomImageHeightDesktop) || 160}
+            bottomImageHeightMobile={Number(c.bottomImageHeightMobile) || 120}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
                 title: s.titleColor || "",
             }}
+            showTopExcerpt={c.showTopExcerpt !== "false"}
+            showTopCategory={c.showTopCategory !== "false"}
+            showBottomExcerpt={c.showBottomExcerpt !== "false"}
+            showBottomCategory={c.showBottomCategory !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -314,19 +418,34 @@ registerBuilderElement("kalbela-11", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 5;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela11UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             leftCount={Number(c.leftCount) || 2}
+            centerImageHeightDesktop={Number(c.centerImageHeightDesktop) || 320}
+            centerImageHeightMobile={Number(c.centerImageHeightMobile) || 220}
+            leftImageHeightDesktop={Number(c.leftImageHeightDesktop) || 180}
+            leftImageHeightMobile={Number(c.leftImageHeightMobile) || 140}
+            rightImageHeightDesktop={Number(c.rightImageHeightDesktop) || 180}
+            rightImageHeightMobile={Number(c.rightImageHeightMobile) || 140}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
                 title: s.titleColor || "",
             }}
+            showCenterExcerpt={c.showCenterExcerpt !== "false"}
+            showCenterCategory={c.showCenterCategory === "true"}
+            showLeftExcerpt={c.showLeftExcerpt !== "false"}
+            showLeftCategory={c.showLeftCategory !== "false"}
+            showRightExcerpt={c.showRightExcerpt !== "false"}
+            showRightCategory={c.showRightCategory !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -338,13 +457,16 @@ registerBuilderElement("kalbela-12", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 8;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela12UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -361,24 +483,29 @@ registerBuilderElement("kalbela-13", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 8;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela13UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
             imageHeightDesktop={Number(c.imageHeightDesktop) || 240}
             imageHeightMobile={Number(c.imageHeightMobile) || 180}
-            showGalleryIcon={c.showGalleryIcon === "true"}
+            showCategory={c.showCategory !== "false"}
+            showExcerpt={c.showExcerpt === "true"}
+            showGalleryIcon={c.showGalleryIcon !== "false"}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
                 title: s.titleColor || "",
-                overlayTitleColor: s.overlayTitleColor || "#fbbf24",
+                overlayTitleColor: s.overlayTitleColor || "#ffffff",
             }}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
@@ -391,24 +518,29 @@ registerBuilderElement("kalbela-14", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
     const s = { ...schema?.schema?.style, ...schema?.style };
     const limit = c.limit ? Number(c.limit) : 8;
-    const { tabs, postsByCategory } = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
+    const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
+    const tabs = rawData.tabs ?? [];
 
     return (
         <Kalbela14UI
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
             imageHeightDesktop={Number(c.imageHeightDesktop) || 240}
             imageHeightMobile={Number(c.imageHeightMobile) || 180}
-            showGalleryIcon={c.showGalleryIcon === "true"}
+            showCategory={c.showCategory !== "false"}
+            showExcerpt={c.showExcerpt === "true"}
+            showGalleryIcon={c.showGalleryIcon !== "false"}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
                 title: s.titleColor || "",
-                overlayTitleColor: s.overlayTitleColor || "#fbbf24",
+                overlayTitleColor: s.overlayTitleColor || "#ffffff",
             }}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}

@@ -32,7 +32,15 @@ interface Kalbela10Props {
     bottomColumnsDesktop?: number;
     bottomColumnsTablet?: number;
     bottomColumnsMobile?: number;
+    topImageHeightDesktop?: number;
+    topImageHeightMobile?: number;
+    bottomImageHeightDesktop?: number;
+    bottomImageHeightMobile?: number;
     colors?: NewsColors;
+    showTopExcerpt?: boolean;
+    showTopCategory?: boolean;
+    showBottomExcerpt?: boolean;
+    showBottomCategory?: boolean;
     showDate?: boolean;
     showLink?: boolean;
 }
@@ -49,7 +57,15 @@ export function Kalbela10UI({
     bottomColumnsDesktop = 4,
     bottomColumnsTablet = 2,
     bottomColumnsMobile = 1,
+    topImageHeightDesktop = 200,
+    topImageHeightMobile = 160,
+    bottomImageHeightDesktop = 160,
+    bottomImageHeightMobile = 120,
     colors = {},
+    showTopExcerpt = true,
+    showTopCategory = true,
+    showBottomExcerpt = true,
+    showBottomCategory = true,
     showDate = true,
     showLink = true,
 }: Kalbela10Props) {
@@ -61,7 +77,8 @@ export function Kalbela10UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const rawPosts = postsByCategory[activeTab] ?? [];
+    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
 
     const topCountNum = Math.min(Number(topCount) || 3, posts.length);
     const topPosts = posts.slice(0, topCountNum);
@@ -97,7 +114,7 @@ export function Kalbela10UI({
     const bottomGridClass = `${btmMobColsClass} ${btmTabColsClass} ${btmDeskColsClass}`;
 
     return (
-        <div className="w-full flex flex-col gap-5 py-3 text-gray-900">
+        <div className="w-full flex flex-col gap-2">
             {/* Header */}
             <KalbelaHeader
                 title={title}
@@ -109,14 +126,21 @@ export function Kalbela10UI({
 
             {/* Top Row Primary Grid */}
             {topPosts.length > 0 && (
-                <div className={`grid ${topGridClass} gap-5 border-b border-gray-200 pb-6`}>
+                <div className={`grid ${topGridClass} gap-3 md:gap-4 border-b border-gray-200 pb-4`}>
                     {topPosts.map((post) => (
-                        <div
+                        <a
                             key={post._id}
-                            className="group flex flex-col gap-2.5 border-r border-gray-100 pr-3 last:border-none"
+                            href={post.postUrl || "#"}
+                            className="group flex flex-col gap-2 border-r border-gray-100 pr-3 last:border-none"
                         >
                             {post.image && (
-                                <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                <div
+                                    className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                    style={{
+                                        "--h-mob": `${topImageHeightMobile}px`,
+                                        "--h-desk": `${topImageHeightDesktop}px`,
+                                    } as React.CSSProperties}
+                                >
                                     <img
                                         src={post.image}
                                         alt={post.title}
@@ -125,26 +149,41 @@ export function Kalbela10UI({
                                 </div>
                             )}
                             <h3
-                                className="text-base md:text-lg font-extrabold text-blue-600 hover:text-blue-700 leading-snug transition-colors"
+                                className="text-base font-medium text-gray-900 leading-snug line-clamp-2 group-hover:text-main transition-colors"
                                 style={{ color: colors.title || undefined }}
                             >
-                                {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                {showTopCategory && post.categoryTitle && (
+                                    <span className="text-red-600 mr-1.5">{post.categoryTitle} /</span>
+                                )}
+                                {post.title}
                             </h3>
-                        </div>
+                            {showTopExcerpt && post.excerpt && (
+                                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                    {post.excerpt.replace(/<[^>]*>/g, "").trim()}
+                                </p>
+                            )}
+                        </a>
                     ))}
                 </div>
             )}
 
             {/* Bottom Row Secondary Grid */}
             {bottomPosts.length > 0 && (
-                <div className={`grid ${bottomGridClass} gap-5 pt-1`}>
+                <div className={`grid ${bottomGridClass} gap-2 md:gap-4 pt-1`}>
                     {bottomPosts.map((post) => (
-                        <div
+                        <a
                             key={post._id}
-                            className="group flex flex-col gap-2.5 border-r border-gray-100 pr-3 last:border-none"
+                            href={post.postUrl || "#"}
+                            className="group flex flex-col gap-2 border-r border-gray-100 pr-3 last:border-none"
                         >
                             {post.image && (
-                                <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-gray-100">
+                                <div
+                                    className="w-full overflow-hidden rounded-xl bg-gray-100 shrink-0 h-(--h-mob) md:h-(--h-desk)"
+                                    style={{
+                                        "--h-mob": `${bottomImageHeightMobile}px`,
+                                        "--h-desk": `${bottomImageHeightDesktop}px`,
+                                    } as React.CSSProperties}
+                                >
                                     <img
                                         src={post.image}
                                         alt={post.title}
@@ -153,12 +192,20 @@ export function Kalbela10UI({
                                 </div>
                             )}
                             <h4
-                                className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors"
+                                className="text-xs md:text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-main transition-colors"
                                 style={{ color: colors.title || undefined }}
                             >
-                                {showLink ? <a href={post.postUrl || "#"}>{post.title}</a> : post.title}
+                                {showBottomCategory && post.categoryTitle && (
+                                    <span className="text-red-600 mr-1">{post.categoryTitle} /</span>
+                                )}
+                                {post.title}
                             </h4>
-                        </div>
+                            {showBottomExcerpt && post.excerpt && (
+                                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                    {post.excerpt.replace(/<[^>]*>/g, "").trim()}
+                                </p>
+                            )}
+                        </a>
                     ))}
                 </div>
             )}
@@ -189,6 +236,7 @@ function Kalbela10CanvasPreview({ element }: { element: any }) {
             title={c.title ?? ""}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             topCount={Number(c.topCount) || 3}
             topColumnsDesktop={Number(c.topColumnsDesktop) || 3}
             topColumnsTablet={Number(c.topColumnsTablet) || 2}
@@ -196,6 +244,10 @@ function Kalbela10CanvasPreview({ element }: { element: any }) {
             bottomColumnsDesktop={Number(c.bottomColumnsDesktop) || 4}
             bottomColumnsTablet={Number(c.bottomColumnsTablet) || 2}
             bottomColumnsMobile={Number(c.bottomColumnsMobile) || 1}
+            topImageHeightDesktop={Number(c.topImageHeightDesktop) || 200}
+            topImageHeightMobile={Number(c.topImageHeightMobile) || 160}
+            bottomImageHeightDesktop={Number(c.bottomImageHeightDesktop) || 160}
+            bottomImageHeightMobile={Number(c.bottomImageHeightMobile) || 120}
             colors={{
                 active: s.activeTabColor || "#2563eb",
                 activeText: s.activeTabTextColor || "#ffffff",
@@ -204,6 +256,10 @@ function Kalbela10CanvasPreview({ element }: { element: any }) {
                 title: s.titleColor || "",
                 titleHover: s.titleHoverColor || "",
             }}
+            showTopExcerpt={c.showTopExcerpt !== "false"}
+            showTopCategory={c.showTopCategory !== "false"}
+            showBottomExcerpt={c.showBottomExcerpt !== "false"}
+            showBottomCategory={c.showBottomCategory !== "false"}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
         />
@@ -228,6 +284,14 @@ const kalbela10Element = {
             bottomColumnsDesktop: 4,
             bottomColumnsTablet: 2,
             bottomColumnsMobile: 1,
+            topImageHeightDesktop: 200,
+            topImageHeightMobile: 160,
+            bottomImageHeightDesktop: 160,
+            bottomImageHeightMobile: 120,
+            showTopExcerpt: "true",
+            showTopCategory: "true",
+            showBottomExcerpt: "true",
+            showBottomCategory: "true",
             showDate: "true",
             showLink: "true",
         },
@@ -251,7 +315,7 @@ const kalbela10Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
+                        <Section label="Title" defaultOpen>
                             <Text label="Title" value={value ?? ""} onChange={onChange} />
                         </Section>
                     ),
@@ -269,8 +333,8 @@ const kalbela10Element = {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 7} onChange={onChange} min={2} max={30} />
+                        <Section label="Limit">
+                            <NumberControl label="Total Limit" value={value ?? 7} onChange={onChange} min={2} max={30} />
                         </Section>
                     ),
                 },
@@ -278,7 +342,7 @@ const kalbela10Element = {
                     name: "topCount",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Top Section Post Count">
+                        <Section label="Sec 1 Count">
                             <NumberControl label="Top Count" value={value ?? 3} onChange={onChange} min={1} max={6} />
                         </Section>
                     ),
@@ -287,8 +351,8 @@ const kalbela10Element = {
                     name: "topColumnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Top Grid Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 3} onChange={onChange} min={1} max={4} />
+                        <Section label="Sec 1 Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 3} onChange={onChange} min={1} max={4} />
                         </Section>
                     ),
                 },
@@ -296,8 +360,8 @@ const kalbela10Element = {
                     name: "topColumnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Top Grid Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 2} onChange={onChange} min={1} max={3} />
+                        <Section label="Sec 1 Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
                         </Section>
                     ),
                 },
@@ -305,8 +369,8 @@ const kalbela10Element = {
                     name: "topColumnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Top Grid Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        <Section label="Sec 1 Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
                         </Section>
                     ),
                 },
@@ -314,8 +378,8 @@ const kalbela10Element = {
                     name: "bottomColumnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Bottom Grid Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 4} onChange={onChange} min={2} max={5} />
+                        <Section label="Sec 2 Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 4} onChange={onChange} min={2} max={5} />
                         </Section>
                     ),
                 },
@@ -323,8 +387,8 @@ const kalbela10Element = {
                     name: "bottomColumnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Bottom Grid Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 2} onChange={onChange} min={1} max={3} />
+                        <Section label="Sec 2 Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
                         </Section>
                     ),
                 },
@@ -332,8 +396,80 @@ const kalbela10Element = {
                     name: "bottomColumnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Bottom Grid Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        <Section label="Sec 2 Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "topImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 1 Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 200} onChange={onChange} min={100} max={600} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "topImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 1 Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "bottomImageHeightDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Img Ht (Dex)">
+                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={500} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "bottomImageHeightMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Img Ht (Mob)">
+                            <NumberControl label="Ht (px)" value={value ?? 120} onChange={onChange} min={60} max={300} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showTopExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 1 Display">
+                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showBottomExcerpt",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Display">
+                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showTopCategory",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 1 Display">
+                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "showBottomCategory",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Display">
+                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                         </Section>
                     ),
                 },
