@@ -125,9 +125,7 @@ export function register() {
         {
             key: "kalbela-data-dump",
             name: "Kalbela News Dataset",
-            filePath: "../plugin/kalbela/data/file.json",
             icon: "solar:document-text-bold",
-            locationIcon: "solar:folder-path-bold-duotone",
             description: "Default categories, news posts, post_info and layout settings dataset for Kalbela plugin.",
             data: kalbelaDataDump,
         },
