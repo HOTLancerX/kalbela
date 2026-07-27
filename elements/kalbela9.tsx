@@ -32,6 +32,9 @@ interface Kalbela9Props {
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
     topSubCount?: number;
+    topSubColumnsDesktop?: number;
+    topSubColumnsTablet?: number;
+    topSubColumnsMobile?: number;
     columnsDesktop?: number;
     columnsTablet?: number;
     columnsMobile?: number;
@@ -64,6 +67,9 @@ export function Kalbela9UI({
     postsByCategory = {},
     limit,
     topSubCount = 2,
+    topSubColumnsDesktop = 2,
+    topSubColumnsTablet = 2,
+    topSubColumnsMobile = 1,
     columnsDesktop = 4,
     columnsTablet = 2,
     columnsMobile = 1,
@@ -98,6 +104,20 @@ export function Kalbela9UI({
     const leadPost = posts[0];
     const topSubPosts = posts.slice(1, 1 + topSubCountNum);
     const bottomPosts = posts.slice(1 + topSubCountNum);
+
+    const topSubDeskColsClass =
+        topSubColumnsDesktop === 4 ? "lg:grid-cols-4" :
+        topSubColumnsDesktop === 3 ? "lg:grid-cols-3" :
+        topSubColumnsDesktop === 1 ? "lg:grid-cols-1" : "lg:grid-cols-2";
+
+    const topSubTabColsClass =
+        topSubColumnsTablet === 3 ? "md:grid-cols-3" :
+        topSubColumnsTablet === 1 ? "md:grid-cols-1" : "md:grid-cols-2";
+
+    const topSubMobColsClass =
+        topSubColumnsMobile === 2 ? "grid-cols-2" : "grid-cols-1";
+
+    const topSubGridClass = `${topSubMobColsClass} ${topSubTabColsClass} ${topSubDeskColsClass}`;
 
     const deskColsClass =
         columnsDesktop === 5 ? "lg:grid-cols-5" :
@@ -177,7 +197,7 @@ export function Kalbela9UI({
 
                     {/* Section 2: Right Top Sub-Cards */}
                     {topSubPosts.length > 0 && (
-                        <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className={`w-full lg:w-1/2 grid ${topSubGridClass} gap-4`}>
                             {topSubPosts.map((post) => (
                                 <a
                                     key={post._id}
@@ -291,6 +311,9 @@ function Kalbela9CanvasPreview({ element }: { element: any }) {
             postsByCategory={postsByCategory}
             limit={limit}
             topSubCount={Number(c.topSubCount) || 2}
+            topSubColumnsDesktop={Number(c.topSubColumnsDesktop) || 2}
+            topSubColumnsTablet={Number(c.topSubColumnsTablet) || 2}
+            topSubColumnsMobile={Number(c.topSubColumnsMobile) || 1}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 2}
             columnsMobile={Number(c.columnsMobile) || 1}
@@ -326,7 +349,7 @@ function Kalbela9CanvasPreview({ element }: { element: any }) {
 const kalbela9Element = {
     type: "kalbela-9",
     category: "kalbela",
-    label: "Kalbela 9 (Dark Lead Panel + Bottom Grid)",
+    label: "Bottom Grid",
     icon: "solar:layout-grid-bold",
 
     schema: {
@@ -335,6 +358,9 @@ const kalbela9Element = {
             categoryIds: [] as string[],
             limit: 7,
             topSubCount: 2,
+            topSubColumnsDesktop: 2,
+            topSubColumnsTablet: 2,
+            topSubColumnsMobile: 1,
             columnsDesktop: 4,
             columnsTablet: 2,
             columnsMobile: 1,
@@ -405,6 +431,33 @@ const kalbela9Element = {
                     render: (value: any, onChange: any) => (
                         <Section label="Sec 2 Count">
                             <NumberControl label="Sub Count" value={value ?? 2} onChange={onChange} min={1} max={6} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "topSubColumnsDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 2} onChange={onChange} min={1} max={4} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "topSubColumnsTablet",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "topSubColumnsMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Sec 2 Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
                         </Section>
                     ),
                 },

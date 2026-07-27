@@ -90,7 +90,7 @@ export function Kalbela2UI({
                                 />
                             </div>
                         )}
-                        <h2 className="text-base line-clamp-2 p-2 font-extrabold text-gray-900 group-hover:text-main transition-colors">
+                        <h2 className="h-15 text-base line-clamp-2 p-2 font-extrabold text-gray-900 group-hover:text-main transition-colors">
                             {leadPost.title}
                         </h2>
                     </a>
@@ -116,7 +116,7 @@ export function Kalbela2UI({
                                         />
                                     </div>
                                 )}
-                                <h4 className="text-sm font-bold p-2 text-gray-900 leading-snug line-clamp-3 group-hover:text-main transition-colors flex-1">
+                                <h4 className="h-17 text-sm font-bold p-2 text-gray-900 leading-snug line-clamp-3 group-hover:text-main transition-colors flex-1">
                                     {post.title}
                                 </h4>
                             </a>
@@ -170,7 +170,7 @@ function Kalbela2CanvasPreview({ element }: { element: any }) {
 const kalbela2Element = {
     type: "kalbela-2",
     category: "kalbela",
-    label: "Kalbela 2 (Lead & Vertical List)",
+    label: "List",
     icon: typeof k2Icon === "string" ? k2Icon : (k2Icon as any)?.src || "solar:widget-2-bold",
 
     schema: {

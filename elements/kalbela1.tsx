@@ -136,7 +136,7 @@ export function Kalbela1UI({
                                 </div>
                             )}
                             {showLink && (
-                                <h4 className="p-2 text-sm md:text-base font-bold text-gray-900 group-hover:text-main line-clamp-2">
+                                <h4 className="h-15 p-2 text-sm md:text-base font-bold text-gray-900 group-hover:text-main line-clamp-2">
                                     {post.title}
                                 </h4>
                             )}

@@ -26,6 +26,13 @@ interface Kalbela11Props {
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
     leftCount?: number;
+    // Column Controls per section
+    leftColumnsDesktop?: number;
+    leftColumnsTablet?: number;
+    leftColumnsMobile?: number;
+    rightColumnsDesktop?: number;
+    rightColumnsTablet?: number;
+    rightColumnsMobile?: number;
     // Image Height Controls per section
     centerImageHeightDesktop?: number;
     centerImageHeightMobile?: number;
@@ -51,6 +58,12 @@ export function Kalbela11UI({
     postsByCategory = {},
     limit,
     leftCount = 2,
+    leftColumnsDesktop = 1,
+    leftColumnsTablet = 1,
+    leftColumnsMobile = 1,
+    rightColumnsDesktop = 1,
+    rightColumnsTablet = 1,
+    rightColumnsMobile = 1,
     centerImageHeightDesktop = 320,
     centerImageHeightMobile = 220,
     leftImageHeightDesktop = 180,
@@ -84,6 +97,38 @@ export function Kalbela11UI({
     const leftPosts = posts.slice(1, 1 + leftCountNum);
     const rightPosts = posts.slice(1 + leftCountNum);
 
+    const leftDeskColsClass =
+        leftColumnsDesktop === 4 ? "lg:grid-cols-4" :
+        leftColumnsDesktop === 3 ? "lg:grid-cols-3" :
+        leftColumnsDesktop === 2 ? "lg:grid-cols-2" : "lg:grid-cols-1";
+
+    const leftTabColsClass =
+        leftColumnsTablet === 4 ? "md:grid-cols-4" :
+        leftColumnsTablet === 3 ? "md:grid-cols-3" :
+        leftColumnsTablet === 2 ? "md:grid-cols-2" : "md:grid-cols-1";
+
+    const leftMobColsClass =
+        leftColumnsMobile === 3 ? "grid-cols-3" :
+        leftColumnsMobile === 2 ? "grid-cols-2" : "grid-cols-1";
+
+    const leftGridClass = `${leftMobColsClass} ${leftTabColsClass} ${leftDeskColsClass}`;
+
+    const rightDeskColsClass =
+        rightColumnsDesktop === 4 ? "lg:grid-cols-4" :
+        rightColumnsDesktop === 3 ? "lg:grid-cols-3" :
+        rightColumnsDesktop === 2 ? "lg:grid-cols-2" : "lg:grid-cols-1";
+
+    const rightTabColsClass =
+        rightColumnsTablet === 4 ? "md:grid-cols-4" :
+        rightColumnsTablet === 3 ? "md:grid-cols-3" :
+        rightColumnsTablet === 2 ? "md:grid-cols-2" : "md:grid-cols-1";
+
+    const rightMobColsClass =
+        rightColumnsMobile === 3 ? "grid-cols-3" :
+        rightColumnsMobile === 2 ? "grid-cols-2" : "grid-cols-1";
+
+    const rightGridClass = `${rightMobColsClass} ${rightTabColsClass} ${rightDeskColsClass}`;
+
     return (
         <div className="w-full flex flex-col gap-2">
             {/* Header */}
@@ -100,7 +145,7 @@ export function Kalbela11UI({
                 <div className="flex flex-col lg:flex-row gap-4 md:gap-5 items-start">
                     {/* Left Column Stack (Sec 2) */}
                     {leftPosts.length > 0 && (
-                        <div className="w-full lg:w-[26%] flex flex-col gap-4 lg:border-r lg:border-gray-200 lg:pr-5 order-2 lg:order-1">
+                        <div className={`w-full lg:w-[26%] grid ${leftGridClass} gap-4 lg:border-r lg:border-gray-200 lg:pr-5 order-2 lg:order-1`}>
                             {leftPosts.map((post) => (
                                 <a
                                     key={post._id}
@@ -175,7 +220,7 @@ export function Kalbela11UI({
 
                     {/* Right Column Stack (Sec 3) */}
                     {rightPosts.length > 0 && (
-                        <div className="w-full lg:w-[26%] flex flex-col gap-4 lg:border-l lg:border-gray-200 lg:pl-5 order-3 lg:order-3">
+                        <div className={`w-full lg:w-[26%] grid ${rightGridClass} gap-4 lg:border-l lg:border-gray-200 lg:pl-5 order-3 lg:order-3`}>
                             {rightPosts.map((post) => (
                                 <a
                                     key={post._id}
@@ -243,6 +288,12 @@ function Kalbela11CanvasPreview({ element }: { element: any }) {
             postsByCategory={postsByCategory}
             limit={limit}
             leftCount={Number(c.leftCount) || 2}
+            leftColumnsDesktop={Number(c.leftColumnsDesktop) || 1}
+            leftColumnsTablet={Number(c.leftColumnsTablet) || 1}
+            leftColumnsMobile={Number(c.leftColumnsMobile) || 1}
+            rightColumnsDesktop={Number(c.rightColumnsDesktop) || 1}
+            rightColumnsTablet={Number(c.rightColumnsTablet) || 1}
+            rightColumnsMobile={Number(c.rightColumnsMobile) || 1}
             centerImageHeightDesktop={Number(c.centerImageHeightDesktop) || 320}
             centerImageHeightMobile={Number(c.centerImageHeightMobile) || 220}
             leftImageHeightDesktop={Number(c.leftImageHeightDesktop) || 180}
@@ -272,7 +323,7 @@ function Kalbela11CanvasPreview({ element }: { element: any }) {
 const kalbela11Element = {
     type: "kalbela-11",
     category: "kalbela",
-    label: "Kalbela 11 (Center Big Lead + Left/Right Stacks)",
+    label: "grid style 5",
     icon: "solar:layout-center-bold",
 
     schema: {
@@ -281,6 +332,12 @@ const kalbela11Element = {
             categoryIds: [] as string[],
             limit: 5,
             leftCount: 2,
+            leftColumnsDesktop: 1,
+            leftColumnsTablet: 1,
+            leftColumnsMobile: 1,
+            rightColumnsDesktop: 1,
+            rightColumnsTablet: 1,
+            rightColumnsMobile: 1,
             centerImageHeightDesktop: 320,
             centerImageHeightMobile: 220,
             leftImageHeightDesktop: 180,
@@ -345,6 +402,60 @@ const kalbela11Element = {
                     render: (value: any, onChange: any) => (
                         <Section label="Left Count">
                             <NumberControl label="Left Count" value={value ?? 2} onChange={onChange} min={1} max={5} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leftColumnsDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 1} onChange={onChange} min={1} max={4} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leftColumnsTablet",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 1} onChange={onChange} min={1} max={4} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "leftColumnsMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Left Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={3} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "rightColumnsDesktop",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Cols (Dex)">
+                            <NumberControl label="Cols (Dex)" value={value ?? 1} onChange={onChange} min={1} max={4} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "rightColumnsTablet",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Cols (Tab)">
+                            <NumberControl label="Cols (Tab)" value={value ?? 1} onChange={onChange} min={1} max={4} />
+                        </Section>
+                    ),
+                },
+                {
+                    name: "rightColumnsMobile",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Section label="Right Cols (Mob)">
+                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={3} />
                         </Section>
                     ),
                 },
