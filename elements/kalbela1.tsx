@@ -90,7 +90,7 @@ export function Kalbela1UI({
 
             {/* 1. Main Top Featured Card (Horizontal Image Left + Blue Headline Right) */}
             {leadPost && (
-                <a href={leadPost.postUrl || "#"} className="group rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all">
+                <a href={leadPost.postUrl || "#"} className="group rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all mb-4">
                     <div className="flex flex-col md:flex-row items-stretch">
                         <div className="w-full md:w-1/2 aspect-16/10 shrink-0">
                             <img
