@@ -11,7 +11,7 @@
  * - belowDescription: Ad slot directly below article description
  */
 
-import Ads from '@/plugin/news-ads/ui/Ads';
+import Ads from '@/components/Ads';
 
 interface KalbelaBlogDetailsProps {
     data: {

@@ -9,11 +9,10 @@
  */
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { getHooks } from '@/hook';
 import { useActivePlugins } from '@/hook/useActivePlugins';
 import KalbelaBox from '../box/Box';
-import Ads from '@/plugin/news-ads/ui/Ads';
+import Ads from '@/components/Ads';
 
 interface Post {
     _id: string;

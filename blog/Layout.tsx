@@ -13,7 +13,7 @@ import { Icon } from '@iconify/react';
 import KalbelaBlogDetails from './details';
 import KalbelaRelated from './Related';
 import Latest from './Latest';
-import Ads from '@/plugin/news-ads/ui/Ads';
+import Ads from '@/components/Ads';
 
 interface BlogPostProps {
     data: {

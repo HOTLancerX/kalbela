@@ -8,7 +8,7 @@
 import Link from 'next/link';
 import KalbelaGrid from './Grid';
 import Image from 'next/image';
-import Ads from '@/plugin/news-ads/ui/Ads';
+import Ads from '@/components/Ads';
 import Latest from '../blog/Latest';
 
 interface BlogCatProps {
