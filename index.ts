@@ -19,6 +19,7 @@ import kalbela12Element from "@/plugin/kalbela/elements/kalbela12";
 import kalbela13Element from "@/plugin/kalbela/elements/kalbela13";
 import kalbela14Element from "@/plugin/kalbela/elements/kalbela14";
 import Headerkb from "./header/Header";
+import Footerkb from "./footer/Footer";
 import KalbelaBox from "./box/Box";
 import KalbelaBoxs from "./box/Boxs";
 import KalbelaCategoryLayout from "./category/Layout";
@@ -38,7 +39,7 @@ export const PLUGINS: PluginMeta = {
 export function register() {
     addHook("root.pages", [
         {
-            key: "header",
+            key: "headerkb",
             label: "Header",
             type: "header",
             slug: "layout",
@@ -46,6 +47,16 @@ export function register() {
             position: 10,
             active: true,           // first-boot default
             component: Headerkb,
+        },
+        {
+            key: "footerkb",
+            label: "Footer",
+            type: "footer",
+            slug: "layout",
+            style: "left",
+            position: 10,
+            active: true,
+            component: Footerkb,
         },
         {
             key: "blog-box",

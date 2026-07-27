@@ -9,6 +9,7 @@ import Link from 'next/link';
 import KalbelaGrid from './Grid';
 import Image from 'next/image';
 import Ads from '@/plugin/news-ads/ui/Ads';
+import Latest from '../blog/Latest';
 
 interface BlogCatProps {
     data: {
@@ -138,7 +139,7 @@ export default function KalbelaCategoryLayout({
                         <div className="sticky top-10 space-y-4">
                             {/* Category Page Right Top Ads */}
                             <Ads type="category" slot="rightTop" settings={settings} />
-
+                            <Latest latest="latest" popular="popular" total={15} postPrefix={postPrefix} />
                             <img className="block w-full max-w-full object-cover" width={250} height={250} src="https://placehold.co/300x600" alt="Ad Space" />
 
                             {/* Category Page Right Bottom Ads */}
