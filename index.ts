@@ -18,12 +18,15 @@ import kalbela11Element from "@/plugin/kalbela/elements/kalbela11";
 import kalbela12Element from "@/plugin/kalbela/elements/kalbela12";
 import kalbela13Element from "@/plugin/kalbela/elements/kalbela13";
 import kalbela14Element from "@/plugin/kalbela/elements/kalbela14";
+import titleElement from "@/plugin/kalbela/elements/title";
 import Headerkb from "./header/Header";
 import Footerkb from "./footer/Footer";
 import KalbelaBox from "./box/Box";
 import KalbelaBoxs from "./box/Boxs";
 import KalbelaCategoryLayout from "./category/Layout";
 import KalbelaBlogLayout from "./blog/Layout";
+import kalbelaDataDump from "./data/file.json";
+
 
 export const PLUGINS: PluginMeta = {
     nx: "com.system.kalbela",
@@ -115,4 +118,18 @@ export function register() {
     addBuilderElement(kalbela12Element, PLUGINS.nx);
     addBuilderElement(kalbela13Element, PLUGINS.nx);
     addBuilderElement(kalbela14Element, PLUGINS.nx);
+    addBuilderElement(titleElement, PLUGINS.nx);
+
+    // ─── Data Input Hook ──────────────────────────────────────────────────────
+    addHook("data.input", [
+        {
+            key: "kalbela-data-dump",
+            name: "Kalbela News Dataset",
+            filePath: "../plugin/kalbela/data/file.json",
+            icon: "solar:document-text-bold",
+            locationIcon: "solar:folder-path-bold-duotone",
+            description: "Default categories, news posts, post_info and layout settings dataset for Kalbela plugin.",
+            data: kalbelaDataDump,
+        },
+    ], PLUGINS.nx);
 }

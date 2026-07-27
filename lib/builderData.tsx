@@ -21,6 +21,7 @@ import { Kalbela11UI } from "../elements/kalbela11";
 import { Kalbela12UI } from "../elements/kalbela12";
 import { Kalbela13UI } from "../elements/kalbela13";
 import { Kalbela14UI } from "../elements/kalbela14";
+import { TitleUI } from "../elements/title";
 
 async function getEnrichedData(categoryIds?: string[], limit: number = 12) {
     try {
@@ -553,6 +554,49 @@ registerBuilderElement("kalbela-14", async (schema, data) => {
             }}
             showDate={c.showDate !== "false"}
             showLink={c.showLink !== "false"}
+        />
+    );
+});
+
+// Register kalbela-title
+registerBuilderElement("kalbela-title", async (schema) => {
+    const c = { ...schema?.schema?.content, ...schema?.content };
+    const s = { ...schema?.schema?.style, ...schema?.style };
+
+    return (
+        <TitleUI
+            title={c.title ?? "বাছাইকৃত"}
+            showTitle={c.showTitle !== "false"}
+            showLeftMedia={c.showLeftMedia !== "false"}
+            leftMediaType={c.leftMediaType ?? "icon"}
+            leftIcon1={c.leftIcon1 ?? "solar:document-text-bold"}
+            leftIcon2={c.leftIcon2 ?? "solar:fire-bold"}
+            leftImage={c.leftImage ?? ""}
+            showRightSide={c.showRightSide !== "false"}
+            showRightText={c.showRightText === "true"}
+            showRightIcon={c.showRightIcon !== "false"}
+            rightLinkText={c.rightLinkText ?? ""}
+            rightLinkUrl={c.rightLinkUrl ?? "#"}
+            rightIcon={c.rightIcon ?? "solar:alt-arrow-right-circle-bold"}
+            showBorder={c.showBorder !== "false"}
+            borderThickness={Number(s.borderThickness) || 3}
+            borderStyle={s.borderStyle ?? "solid"}
+            borderColor={s.borderColor || "#000000"}
+            borderGap={Number(s.borderGap) || 8}
+            titleColor={s.titleColor || "#000000"}
+            titleFontSize={Number(s.titleFontSize) || 20}
+            titleFontWeight={s.titleFontWeight || "700"}
+            leftIcon1Color={s.leftIcon1Color || "#ffffff"}
+            leftIcon1Bg={s.leftIcon1Bg || "#dc2626"}
+            leftIcon1Size={Number(s.leftIcon1Size) || 16}
+            leftIcon2Color={s.leftIcon2Color || "#dc2626"}
+            leftIcon2Bg={s.leftIcon2Bg || ""}
+            leftIcon2Size={Number(s.leftIcon2Size) || 18}
+            leftImageWidth={Number(s.leftImageWidth) || 24}
+            leftImageHeight={Number(s.leftImageHeight) || 24}
+            rightTextColor={s.rightTextColor || "#111827"}
+            rightIconColor={s.rightIconColor || "#000000"}
+            rightIconSize={Number(s.rightIconSize) || 24}
         />
     );
 });
