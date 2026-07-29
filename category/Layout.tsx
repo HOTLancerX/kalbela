@@ -127,12 +127,18 @@ export default function KalbelaCategoryLayout({
                         </div>
                     </div>
 
-                    {/* Post Grid - Grid 1 (Single column list) */}
+                    {/* Post Grid - Grid 1 (Responsive grid feed) */}
                     <div className="order-2 lg:col-span-6 space-y-6">
                         <KalbelaGrid
                             posts={posts}
                             activeBox={activeBox}
                             postPrefix={postPrefix}
+                            columnsDesktop={settings.category_grid_cols_desktop ? Number(settings.category_grid_cols_desktop) : 1}
+                            columnsTablet={settings.category_grid_cols_tablet ? Number(settings.category_grid_cols_tablet) : 1}
+                            columnsMobile={settings.category_grid_cols_mobile ? Number(settings.category_grid_cols_mobile) : 1}
+                            gapDesktop={settings.category_grid_gap_desktop != null ? Number(settings.category_grid_gap_desktop) : 4}
+                            gapTablet={settings.category_grid_gap_tablet != null ? Number(settings.category_grid_gap_tablet) : 3}
+                            gapMobile={settings.category_grid_gap_mobile != null ? Number(settings.category_grid_gap_mobile) : 2}
                         />
                     </div>
                     <div className="order-3 lg:col-span-3 self-stretch hidden md:block">

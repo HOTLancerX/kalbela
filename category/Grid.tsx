@@ -27,6 +27,12 @@ interface KalbelaGridProps {
     activeBox: { label: string; pluginNx: string } | null;
     postPrefix: string;
     gridClassName?: string;
+    columnsDesktop?: number;
+    columnsTablet?: number;
+    columnsMobile?: number;
+    gapDesktop?: number;
+    gapTablet?: number;
+    gapMobile?: number;
 }
 
 function buildUrl(prefix: string, slug: string): string {
@@ -38,10 +44,28 @@ export default function KalbelaGrid({
     posts,
     activeBox,
     postPrefix,
-    gridClassName = 'grid grid-cols-1 gap-4',
+    gridClassName,
+    columnsDesktop = 1,
+    columnsTablet = 1,
+    columnsMobile = 1,
+    gapDesktop = 4,
+    gapTablet = 3,
+    gapMobile = 2,
 }: KalbelaGridProps) {
     const activePlugins = useActivePlugins();
     const [BoxComponent, setBoxComponent] = useState<any>(null);
+
+    const mobColsClass = Number(columnsMobile) || 1;
+    const tabColsClass = Number(columnsTablet) || 1;
+    const deskColsClass = Number(columnsDesktop) || 1;
+
+    const mobGapClass = `gap-${gapMobile != null ? Number(gapMobile) : 2}`;
+    const tabGapClass = `md:gap-${gapTablet != null ? Number(gapTablet) : 3}`;
+    const deskGapClass = `lg:gap-${gapDesktop != null ? Number(gapDesktop) : 4}`;
+
+    const computedGridClass =
+        gridClassName ||
+        `grid grid-cols-${mobColsClass} md:grid-cols-${tabColsClass} lg:grid-cols-${deskColsClass} ${mobGapClass} ${tabGapClass} ${deskGapClass} w-full`;
 
     useEffect(() => {
         if (activePlugins === null) return;
@@ -67,7 +91,7 @@ export default function KalbelaGrid({
     // Loading skeleton
     if (activePlugins === null) {
         return (
-            <div className={gridClassName}>
+            <div className={computedGridClass}>
                 {Array.from({ length: Math.min(posts.length || 5, 5) }).map((_, i) => (
                     <div
                         key={i}
@@ -97,7 +121,7 @@ export default function KalbelaGrid({
     const CardComponent = BoxComponent || KalbelaBox;
 
     return (
-        <div className={gridClassName}>
+        <div className={computedGridClass}>
             {posts.map((post, idx) => (
                 <div key={post._id || idx} className="space-y-4">
                     <CardComponent
