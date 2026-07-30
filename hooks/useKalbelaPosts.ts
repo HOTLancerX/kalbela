@@ -56,19 +56,24 @@ export function useKalbelaPosts(categoryIds: string[] = [], limit: number = 7) {
             .then((r) => r.json())
             .then(async (data) => {
                 const allCats: { _id: string; title: string; slug: string }[] = data.cats ?? [];
-                const orderedTabs: Tab[] = categoryIds.length
+                const fetchCats = categoryIds && categoryIds.length
+                    ? categoryIds.map((id) => allCats.find((cat) => cat._id === id)).filter(Boolean)
+                    : allCats;
+
+                const orderedTabs: Tab[] = categoryIds && categoryIds.length
                     ? categoryIds.map((id) => allCats.find((cat) => cat._id === id)).filter(Boolean).map((cat) => ({ _id: cat!._id, title: cat!.title, url: `/${cat!.slug}` }))
-                    : allCats.map((cat) => ({ _id: cat._id, title: cat.title, url: `/${cat.slug}` }));
+                    : [];
 
                 setTabs(orderedTabs);
                 const safeLimit = Math.min(Math.max(1, Number(limit) || 6), 50);
                 const results = await Promise.all(
-                    orderedTabs.map((tab) => {
-                        const params = new URLSearchParams({ type: "blog", limit: String(safeLimit), cats: tab._id });
+                    fetchCats.map((cat) => {
+                        const catId = cat!._id;
+                        const params = new URLSearchParams({ type: "blog", limit: String(safeLimit), cats: catId });
                         return xFetch(`/builder-post?${params}`)
                             .then((r) => r.json())
                             .then((d) => ({
-                                id: tab._id,
+                                id: catId,
                                 posts: sortPostsLatestFirst(
                                     ((d.posts ?? []) as any[]).slice(0, safeLimit).map((p): TabPost => ({
                                         _id: p._id,
@@ -83,7 +88,7 @@ export function useKalbelaPosts(categoryIds: string[] = [], limit: number = 7) {
                                     }))
                                 ),
                             }))
-                            .catch(() => ({ id: tab._id, posts: [] as TabPost[] }));
+                            .catch(() => ({ id: catId, posts: [] as TabPost[] }));
                     })
                 );
 

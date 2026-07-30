@@ -46,7 +46,7 @@ function filterPostsByLimit(postsByCategory?: Record<string, any[]>, limit?: num
 
 function getCategoryTabs(rawDataTabs: any[], categoryIds?: string[]) {
     if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
-        return rawDataTabs ?? [];
+        return [];
     }
     return categoryIds
         .map((id: string) => rawDataTabs.find((t: any) => t._id === id))
