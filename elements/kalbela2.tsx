@@ -11,18 +11,18 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 import k2Icon from "../icon/k2.png";
 
 interface Kalbela2Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -38,6 +38,7 @@ interface Kalbela2Props {
 
 export function Kalbela2UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -58,7 +59,8 @@ export function Kalbela2UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const leadPost = posts[0];
     const listPosts = posts.slice(1);
@@ -149,8 +151,10 @@ function Kalbela2CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela2UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             imagePosition={c.imagePosition || "left"}
             colors={{
                 active: s.activeTabColor || "#2563eb",
@@ -203,73 +207,61 @@ const kalbela2Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 6} onChange={onChange} min={2} max={25} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 6} onChange={onChange} min={2} max={25} />
                     ),
                 },
                 {
                     name: "imagePosition",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="List Image Position">
-                            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("left")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        (value ?? "left") === "left" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Left
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("right")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        value === "right" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Right
-                                </button>
-                            </div>
-                        </Section>
+                        <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
+                            <button
+                                type="button"
+                                onClick={() => onChange("left")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    (value ?? "left") === "left" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Left
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onChange("right")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    value === "right" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Right
+                            </button>
+                        </div>
                     ),
                 },
                 {
                     name: "showCategory",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showDate",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -282,9 +274,7 @@ const kalbela2Element = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Color" defaultOpen>
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
                     ),
                 },
             ],

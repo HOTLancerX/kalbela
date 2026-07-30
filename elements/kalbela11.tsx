@@ -11,17 +11,17 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela11Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -54,6 +54,7 @@ interface Kalbela11Props {
 
 export function Kalbela11UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -88,8 +89,8 @@ export function Kalbela11UI({
         }
     }, [tabs, activeTab]);
 
-    const rawPosts = postsByCategory[activeTab] ?? [];
-    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const centerLeadPost = posts[0];
     const leftCountNum = Math.min(Number(leftCount) || 2, Math.max(0, posts.length - 1));
@@ -284,6 +285,7 @@ function Kalbela11CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela11UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -323,7 +325,7 @@ function Kalbela11CanvasPreview({ element }: { element: any }) {
 const kalbela11Element = {
     type: "kalbela-11",
     category: "kalbela",
-    label: "grid style 5",
+    label: "Kalbela 11 (Center Big Lead + Dual Side Stacks)",
     icon: "solar:layout-center-bold",
 
     schema: {
@@ -373,207 +375,28 @@ const kalbela11Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Limit">
-                            <NumberControl label="Total Limit" value={value ?? 5} onChange={onChange} min={3} max={20} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 5} onChange={onChange} min={3} max={30} />
                     ),
                 },
                 {
                     name: "leftCount",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Count">
-                            <NumberControl label="Left Count" value={value ?? 2} onChange={onChange} min={1} max={5} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leftColumnsDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Cols (Dex)">
-                            <NumberControl label="Cols (Dex)" value={value ?? 1} onChange={onChange} min={1} max={4} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leftColumnsTablet",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Cols (Tab)">
-                            <NumberControl label="Cols (Tab)" value={value ?? 1} onChange={onChange} min={1} max={4} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leftColumnsMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Cols (Mob)">
-                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={3} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "rightColumnsDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Cols (Dex)">
-                            <NumberControl label="Cols (Dex)" value={value ?? 1} onChange={onChange} min={1} max={4} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "rightColumnsTablet",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Cols (Tab)">
-                            <NumberControl label="Cols (Tab)" value={value ?? 1} onChange={onChange} min={1} max={4} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "rightColumnsMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Cols (Mob)">
-                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={3} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "centerImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Center Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 320} onChange={onChange} min={100} max={700} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "centerImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Center Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 220} onChange={onChange} min={80} max={500} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leftImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={80} max={500} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leftImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={60} max={400} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "rightImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={80} max={500} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "rightImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={60} max={400} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showCenterExcerpt",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Center Display">
-                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showLeftExcerpt",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Display">
-                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showRightExcerpt",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Display">
-                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showCenterCategory",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Center Display">
-                            <Toggle label="Show Category" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showLeftCategory",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Left Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showRightCategory",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Right Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showDate",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <NumberControl label="Left Column Count" value={value ?? 2} onChange={onChange} min={1} max={6} />
                     ),
                 },
             ],
@@ -586,9 +409,7 @@ const kalbela11Element = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Color" defaultOpen>
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
                     ),
                 },
             ],

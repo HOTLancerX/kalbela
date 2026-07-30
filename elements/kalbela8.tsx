@@ -13,17 +13,17 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela8Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -42,6 +42,7 @@ interface Kalbela8Props {
 
 export function Kalbela8UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -65,8 +66,8 @@ export function Kalbela8UI({
         }
     }, [tabs, activeTab]);
 
-    const rawPosts = postsByCategory[activeTab] ?? [];
-    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const leadCountNum = Math.min(Number(leadCount) || 2, posts.length);
     const leadPosts = posts.slice(0, leadCountNum);
@@ -194,6 +195,7 @@ function Kalbela8CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela8UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -261,146 +263,87 @@ const kalbela8Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 5} onChange={onChange} min={2} max={20} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 5} onChange={onChange} min={2} max={30} />
                     ),
                 },
                 {
                     name: "leadCount",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Section Lead Count">
-                            <NumberControl label="Lead Count" value={value ?? 2} onChange={onChange} min={1} max={5} />
-                        </Section>
+                        <NumberControl label="Left Lead Count" value={value ?? 2} onChange={onChange} min={1} max={5} />
                     ),
                 },
                 {
                     name: "leftImagePosition",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Section Image Position">
-                            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("left")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        (value ?? "left") === "left" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Left
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("right")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        value === "right" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Right
-                                </button>
-                            </div>
-                        </Section>
+                        <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
+                            <button
+                                type="button"
+                                onClick={() => onChange("left")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    (value ?? "left") === "left" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Left Img Left
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onChange("right")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    value === "right" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Left Img Right
+                            </button>
+                        </div>
                     ),
                 },
                 {
                     name: "rightImagePosition",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Section Image Position">
-                            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("left")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        value === "left" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Left
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("right")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        (value ?? "right") === "right" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Right
-                                </button>
-                            </div>
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leadImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Lead Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 200} onChange={onChange} min={100} max={600} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leadImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Lead Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "subImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sub Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 80} onChange={onChange} min={40} max={300} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "subImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sub Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 64} onChange={onChange} min={30} max={200} />
-                        </Section>
+                        <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
+                            <button
+                                type="button"
+                                onClick={() => onChange("left")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    value === "left" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Right Img Left
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onChange("right")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    (value ?? "right") === "right" ? "bg-white shadow-xs text-main font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Right Img Right
+                            </button>
+                        </div>
                     ),
                 },
                 {
                     name: "showExcerpt",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Excerpt Text" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showDate",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -413,9 +356,7 @@ const kalbela8Element = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Color" defaultOpen>
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
                     ),
                 },
             ],

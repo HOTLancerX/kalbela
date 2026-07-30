@@ -11,17 +11,17 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela13Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -42,6 +42,7 @@ interface Kalbela13Props {
 
 export function Kalbela13UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -65,8 +66,8 @@ export function Kalbela13UI({
         }
     }, [tabs, activeTab]);
 
-    const rawPosts = postsByCategory[activeTab] ?? [];
-    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const deskColsClass =
         columnsDesktop === 6 ? "lg:grid-cols-6" :
@@ -178,6 +179,7 @@ function Kalbela13CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela13UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -247,108 +249,70 @@ const kalbela13Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Limit">
-                            <NumberControl label="Total Limit" value={value ?? 8} onChange={onChange} min={1} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 8} onChange={onChange} min={2} max={30} />
                     ),
                 },
                 {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Cols (Dex)">
-                            <NumberControl label="Cols (Dex)" value={value ?? 4} onChange={onChange} min={1} max={6} />
-                        </Section>
+                        <NumberControl label="Desktop Columns" value={value ?? 4} onChange={onChange} min={2} max={6} />
                     ),
                 },
                 {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Cols (Tab)">
-                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={4} />
-                        </Section>
+                        <NumberControl label="Tablet Columns" value={value ?? 2} onChange={onChange} min={1} max={4} />
                     ),
                 },
                 {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Cols (Mob)">
-                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
-                        </Section>
+                        <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
                     ),
                 },
                 {
                     name: "imageHeightDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 240} onChange={onChange} min={120} max={500} />
-                        </Section>
+                        <NumberControl label="Image Height Desktop (px)" value={value ?? 240} onChange={onChange} min={120} max={450} />
                     ),
                 },
                 {
                     name: "imageHeightMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={100} max={350} />
-                        </Section>
+                        <NumberControl label="Image Height Mobile (px)" value={value ?? 180} onChange={onChange} min={100} max={350} />
                     ),
                 },
                 {
                     name: "showCategory",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showExcerpt",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Excerpt" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showGalleryIcon",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Gallery Icon" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showDate",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Camera Icon" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -358,21 +322,17 @@ const kalbela13Element = {
             section: "Colors",
             controls: [
                 {
-                    name: "overlayTitleColor",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Overlay Title Color" defaultOpen>
-                            <ColorPickerPopup label="Title Color" value={value ?? "#ffffff"} onChange={onChange} />
-                        </Section>
-                    ),
-                },
-                {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Header Title Color">
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
+                    ),
+                },
+                {
+                    name: "overlayTitleColor",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <ColorPickerPopup label="Card Text Color" value={value ?? "#ffffff"} onChange={onChange} />
                     ),
                 },
             ],

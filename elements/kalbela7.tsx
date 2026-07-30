@@ -11,17 +11,17 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela7Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -41,6 +41,7 @@ interface Kalbela7Props {
 
 export function Kalbela7UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -65,8 +66,8 @@ export function Kalbela7UI({
         }
     }, [tabs, activeTab]);
 
-    const rawPosts = postsByCategory[activeTab] ?? [];
-    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const leadPost = posts[0];
     const subPosts = posts.slice(1);
@@ -195,6 +196,7 @@ function Kalbela7CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela7UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -264,117 +266,56 @@ const kalbela7Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 7} onChange={onChange} min={2} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 7} onChange={onChange} min={2} max={30} />
                     ),
                 },
                 {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sub Cols (Dex)">
-                            <NumberControl label="Cols (Dex)" value={value ?? 3} onChange={onChange} min={2} max={4} />
-                        </Section>
+                        <NumberControl label="Right Grid Columns (Desktop)" value={value ?? 3} onChange={onChange} min={2} max={4} />
                     ),
                 },
                 {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sub Cols (Tab)">
-                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
-                        </Section>
+                        <NumberControl label="Right Grid Columns (Tablet)" value={value ?? 2} onChange={onChange} min={1} max={3} />
                     ),
                 },
                 {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sub Cols (Mob)">
-                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leadImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Lead Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 320} onChange={onChange} min={100} max={700} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leadImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Lead Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 220} onChange={onChange} min={80} max={500} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "subImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sub Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={80} max={500} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "subImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sub Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={60} max={400} />
-                        </Section>
+                        <NumberControl label="Right Grid Columns (Mobile)" value={value ?? 1} onChange={onChange} min={1} max={2} />
                     ),
                 },
                 {
                     name: "showCategory",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Category Prefix" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Category Prefix" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showExcerpt",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Excerpt Text" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showDate",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -387,9 +328,7 @@ const kalbela7Element = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Color" defaultOpen>
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
                     ),
                 },
             ],

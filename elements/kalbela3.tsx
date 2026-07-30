@@ -12,17 +12,17 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela3Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -54,6 +54,7 @@ function getEmblaSlideFlexClass(desktop: number = 4, tablet: number = 3, mobile:
 
 export function Kalbela3UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -73,7 +74,8 @@ export function Kalbela3UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: "start",
@@ -200,8 +202,10 @@ function Kalbela3CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela3UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 4}
             columnsTablet={Number(c.columnsTablet) || 3}
             columnsMobile={Number(c.columnsMobile) || 1}
@@ -258,72 +262,56 @@ const kalbela3Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 8} onChange={onChange} min={3} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 8} onChange={onChange} min={3} max={30} />
                     ),
                 },
                 {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 4} onChange={onChange} min={2} max={6} />
-                        </Section>
+                        <NumberControl label="Desktop Columns" value={value ?? 4} onChange={onChange} min={2} max={6} />
                     ),
                 },
                 {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 3} onChange={onChange} min={1} max={4} />
-                        </Section>
+                        <NumberControl label="Tablet Columns" value={value ?? 3} onChange={onChange} min={1} max={4} />
                     ),
                 },
                 {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
-                        </Section>
+                        <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
                     ),
                 },
                 {
                     name: "showPlayButton",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Play Button" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Play Icon" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showDate",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -336,9 +324,7 @@ const kalbela3Element = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Color" defaultOpen>
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
                     ),
                 },
             ],

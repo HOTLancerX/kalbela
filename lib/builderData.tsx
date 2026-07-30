@@ -44,6 +44,15 @@ function filterPostsByLimit(postsByCategory?: Record<string, any[]>, limit?: num
     return result;
 }
 
+function getCategoryTabs(rawDataTabs: any[], categoryIds?: string[]) {
+    if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
+        return rawDataTabs ?? [];
+    }
+    return categoryIds
+        .map((id: string) => rawDataTabs.find((t: any) => t._id === id))
+        .filter(Boolean);
+}
+
 // Register kalbela (Breaking News Ticker)
 registerBuilderElement("kalbela", async (schema, data) => {
     const c = { ...schema?.schema?.content, ...schema?.content };
@@ -51,13 +60,21 @@ registerBuilderElement("kalbela", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 10;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+
+    const combined = Object.values(postsByCategory).flat() as any[];
+    const uniqueMap = new Map<string, any>();
+    combined.forEach((p) => {
+        if (p?._id && !uniqueMap.has(p._id)) uniqueMap.set(p._id, p);
+    });
+    const posts = Array.from(uniqueMap.values()).sort((a, b) => {
+        const parseDate = (v: any) => { if (!v) return 0; const t = new Date(v).getTime(); return isNaN(t) ? 0 : t; };
+        return parseDate(b.createdAt) - parseDate(a.createdAt);
+    }).slice(0, limit);
 
     return (
         <KalbelaUI
             title={c.title ?? "শিরোনাম"}
-            tabs={tabs}
-            postsByCategory={postsByCategory}
+            posts={posts}
             limit={limit}
             speed={Number(c.speed) || 35}
             tickerStyle={c.tickerStyle || "marquee"}
@@ -86,11 +103,12 @@ registerBuilderElement("kalbela-1", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 7;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela1UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -116,11 +134,12 @@ registerBuilderElement("kalbela-2", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 6;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela2UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -144,11 +163,12 @@ registerBuilderElement("kalbela-3", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 8;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela3UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -174,11 +194,12 @@ registerBuilderElement("kalbela-4", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 9;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela4UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -204,11 +225,12 @@ registerBuilderElement("kalbela-5", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 6;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela5UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -237,11 +259,12 @@ registerBuilderElement("kalbela-6", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 11;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela6UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -266,11 +289,12 @@ registerBuilderElement("kalbela-7", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 7;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela7UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -301,11 +325,12 @@ registerBuilderElement("kalbela-8", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 5;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela8UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -335,11 +360,12 @@ registerBuilderElement("kalbela-9", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 7;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela9UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -383,11 +409,12 @@ registerBuilderElement("kalbela-10", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 7;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela10UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -424,11 +451,12 @@ registerBuilderElement("kalbela-11", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 5;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela11UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -469,11 +497,12 @@ registerBuilderElement("kalbela-12", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 8;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela12UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -495,11 +524,12 @@ registerBuilderElement("kalbela-13", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 8;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela13UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -530,11 +560,12 @@ registerBuilderElement("kalbela-14", async (schema, data) => {
     const limit = c.limit ? Number(c.limit) : 8;
     const rawData = data?.builderContext ?? (await getEnrichedData(c.categoryIds, limit));
     const postsByCategory = filterPostsByLimit(rawData.postsByCategory, limit);
-    const tabs = rawData.tabs ?? [];
+    const tabs = getCategoryTabs(rawData.tabs, c.categoryIds);
 
     return (
         <Kalbela14UI
             title={c.title ?? ""}
+            categoryIds={c.categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}

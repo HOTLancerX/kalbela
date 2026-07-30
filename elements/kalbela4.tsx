@@ -12,13 +12,12 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela4Colors extends NewsColors {
@@ -28,6 +27,7 @@ interface Kalbela4Colors extends NewsColors {
 
 interface Kalbela4Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -46,6 +46,7 @@ function truncateHtmlText(html: string, maxLen: number = 120) {
 
 export function Kalbela4UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -63,7 +64,8 @@ export function Kalbela4UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     // Group posts into slides (default 3 cards stacked vertically per slide)
     const chunkSize = Math.max(1, itemsPerSlide);
@@ -205,8 +207,10 @@ function Kalbela4CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela4UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             itemsPerSlide={Number(c.itemsPerSlide) || 3}
             excerptLimit={Number(c.excerptLimit) || 120}
             colors={{
@@ -263,45 +267,42 @@ const kalbela4Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 9} onChange={onChange} min={3} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 9} onChange={onChange} min={3} max={30} />
                     ),
                 },
                 {
                     name: "itemsPerSlide",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Cards per Slide">
-                            <NumberControl label="Items per Slide" value={value ?? 3} onChange={onChange} min={1} max={5} />
-                        </Section>
+                        <NumberControl label="Items per Slide" value={value ?? 3} onChange={onChange} min={1} max={5} />
                     ),
                 },
                 {
                     name: "excerptLimit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Excerpt Character Limit">
-                            <NumberControl label="Character Limit" value={value ?? 120} onChange={onChange} min={30} max={400} />
-                        </Section>
+                        <NumberControl label="Excerpt Limit" value={value ?? 120} onChange={onChange} min={30} max={300} />
+                    ),
+                },
+                {
+                    name: "showDate",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -311,30 +312,24 @@ const kalbela4Element = {
             section: "Colors",
             controls: [
                 {
+                    name: "titleColor",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
+                    ),
+                },
+                {
                     name: "cardBgColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Card Background Color" defaultOpen>
-                            <ColorPickerPopup label="Background Color" value={value ?? "#fefce8"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Card Bg Color" value={value ?? "#fefce8"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "borderColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Bottom Border Color" defaultOpen>
-                            <ColorPickerPopup label="Border Color" value={value ?? "#dc2626"} onChange={onChange} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "titleColor",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Title Color">
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Bottom Border Color" value={value ?? "#dc2626"} onChange={onChange} />
                     ),
                 },
             ],

@@ -14,13 +14,12 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
-import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { TabPost, NewsColors } from "../lib/types";
+import { useLatestPosts } from "../hooks/useKalbelaPosts";
 
 interface KalbelaProps {
     title?: string;
@@ -33,8 +32,7 @@ interface KalbelaProps {
     showCategory?: boolean;
     showDate?: boolean;
     showLink?: boolean;
-    tabs?: Tab[];
-    postsByCategory?: Record<string, TabPost[]>;
+    posts?: TabPost[];
     colors?: NewsColors & {
         tickerBgColor?: string;
         titleBgColor?: string;
@@ -49,8 +47,6 @@ interface KalbelaProps {
 
 export function KalbelaUI({
     title = "শিরোনাম",
-    tabs = [],
-    postsByCategory = {},
     limit = 10,
     speed = 35,
     tickerStyle = "marquee",
@@ -59,13 +55,9 @@ export function KalbelaUI({
     showCategory = true,
     showDate = false,
     showLink = true,
+    posts = [],
     colors = {},
 }: KalbelaProps) {
-    const [activeTab] = useState<string>(tabs[0]?._id ?? "");
-    const rawPosts = postsByCategory[activeTab] ?? [];
-
-    // Fallback demo posts if posts array is empty
-    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
     const displayPosts = posts.length > 0 ? posts : [
         { _id: "1", title: "বাংলাদেশ কাঁপছে একুশে বইমেলার মেগা উৎসবে", postUrl: "#", categoryTitle: "জাতীয়" },
         { _id: "2", title: "তথ্যপ্রযুক্তির প্রসারে নতুন মাইলফলক অর্জন", postUrl: "#", categoryTitle: "প্রযুক্তি" },
@@ -222,7 +214,7 @@ export function KalbelaUI({
                         onClick={togglePlay}
                         aria-label={isPlaying ? "Pause ticker" : "Play ticker"}
                         className="p-1 rounded-md transition-all hover:bg-gray-200/70 cursor-pointer text-gray-700"
-                        title={isPlaying ? "বিরতি" : "চালু"}
+                        title="চালু"
                     >
                         <Icon
                             icon={isPlaying && !isHovered ? "mdi:pause" : "mdi:play"}
@@ -265,7 +257,7 @@ function KalbelaCanvasPreview({ element }: { element: any }) {
     const categoryIds: string[] = c.categoryIds ?? [];
     const limit: number = Number(c.limit) || 10;
 
-    const { tabs, postsByCategory, loading } = useKalbelaPosts(categoryIds, limit);
+    const { posts, loading } = useLatestPosts(categoryIds, limit);
 
     if (loading) {
         return (
@@ -279,8 +271,7 @@ function KalbelaCanvasPreview({ element }: { element: any }) {
     return (
         <KalbelaUI
             title={c.title ?? "শিরোনাম"}
-            tabs={tabs}
-            postsByCategory={postsByCategory}
+            posts={posts}
             limit={limit}
             speed={Number(c.speed) || 35}
             tickerStyle={c.tickerStyle || "marquee"}
@@ -342,91 +333,75 @@ const kalbelaElement = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Badge Title" defaultOpen>
-                            <Text label="Title" value={value ?? "শিরোনাম"} onChange={onChange} />
-                        </Section>
+                        <Text label="Badge Title" value={value ?? "শিরোনাম"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "tickerStyle",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Ticker Style" defaultOpen>
-                            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("marquee")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        (value ?? "marquee") === "marquee" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Horizontal Marquee
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onChange("vertical")}
-                                    className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
-                                        value === "vertical" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
-                                    }`}
-                                >
-                                    Vertical Slide Up
-                                </button>
-                            </div>
-                        </Section>
+                        <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg text-xs font-semibold">
+                            <button
+                                type="button"
+                                onClick={() => onChange("marquee")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    (value ?? "marquee") === "marquee" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Horizontal Marquee
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onChange("vertical")}
+                                className={`flex-1 py-1.5 rounded-md transition-all cursor-pointer ${
+                                    value === "vertical" ? "bg-white shadow-xs text-blue-600 font-bold" : "text-gray-600"
+                                }`}
+                            >
+                                Vertical Slide Up
+                            </button>
+                        </div>
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories">
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Limit">
-                            <NumberControl label="Total Limit" value={value ?? 10} onChange={onChange} min={1} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 10} onChange={onChange} min={1} max={30} />
                     ),
                 },
                 {
                     name: "speed",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Marquee Speed (Sec)">
-                            <NumberControl label="Duration (s)" value={value ?? 35} onChange={onChange} min={10} max={100} />
-                        </Section>
+                        <NumberControl label="Marquee Speed (s)" value={value ?? 35} onChange={onChange} min={10} max={100} />
                     ),
                 },
                 {
                     name: "autoplay",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Enable Autoplay" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Enable Autoplay" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showControls",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Controls" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Controls" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showCategory",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -439,45 +414,42 @@ const kalbelaElement = {
                     name: "titleBgColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Badge Background" defaultOpen>
-                            <ColorPickerPopup label="Badge Bg" value={value ?? "#dc2626"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Badge Background" value={value ?? "#dc2626"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "titleTextColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Badge Text Color">
-                            <ColorPickerPopup label="Text Color" value={value ?? "#ffffff"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Badge Text Color" value={value ?? "#ffffff"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "tickerBgColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Ticker Background">
-                            <ColorPickerPopup label="Bar Bg" value={value ?? "#f8fafc"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Ticker Background" value={value ?? "#f8fafc"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "newsTextColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="News Text Color">
-                            <ColorPickerPopup label="News Color" value={value ?? "#1e293b"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="News Text Color" value={value ?? "#1e293b"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "newsHoverTextColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="News Hover Color">
-                            <ColorPickerPopup label="Hover Color" value={value ?? "#dc2626"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="News Hover Color" value={value ?? "#dc2626"} onChange={onChange} />
+                    ),
+                },
+                {
+                    name: "controlIconColor",
+                    responsive: false,
+                    render: (value: any, onChange: any) => (
+                        <ColorPickerPopup label="Control Icon Color" value={value ?? "#475569"} onChange={onChange} />
                     ),
                 },
             ],

@@ -11,18 +11,18 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 import k1Icon from "../icon/k1.png";
 
 interface Kalbela1Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -37,6 +37,7 @@ interface Kalbela1Props {
 
 export function Kalbela1UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -56,7 +57,8 @@ export function Kalbela1UI({
         }
     }, [tabs, activeTab]);
 
-    const posts = postsByCategory[activeTab] ?? [];
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const leadPost = posts[0];
     const subPosts = posts.slice(1);
@@ -99,47 +101,47 @@ export function Kalbela1UI({
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-101"
                             />
                         </div>
-                        <div className="w-full md:w-1/2 flex flex-col justify-start gap-3 p-2">
-                            <h2
-                                className="text-xl md:text-2xl lg:text-2xl line-clamp-3 font-bold hover:text-blue-700"
-                                style={{ color: colors.title || undefined }}
-                            >
+                        <div className="w-full md:w-1/2 p-5 flex flex-col justify-center">
+                            {showCategory && leadPost.categoryTitle && (
+                                <span className="text-xs font-bold text-red-600 mb-2">
+                                    {leadPost.categoryTitle}
+                                </span>
+                            )}
+                            <h2 className="text-xl md:text-2xl font-bold text-blue-600 group-hover:text-blue-700 leading-snug transition-colors line-clamp-3">
                                 {leadPost.title}
                             </h2>
                             {leadPost.excerpt && (
-                                <div
-                                    className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-4 md:line-clamp-6"
-                                    dangerouslySetInnerHTML={{ __html: leadPost.excerpt }}
-                                />
+                                <p className="text-gray-600 text-sm mt-3 line-clamp-3 leading-relaxed">
+                                    {leadPost.excerpt}
+                                </p>
                             )}
                         </div>
                     </div>
                 </a>
             )}
 
-            {/* 2. Sub-Posts Grid */}
+            {/* 2. Remaining Posts Dynamic Grid */}
             {subPosts.length > 0 && (
-                <div className={`grid ${gridClass} gap-4 md:gap-5`}>
+                <div className={`grid gap-4 ${gridClass}`}>
                     {subPosts.map((post) => (
-                        <a
-                            href={post.postUrl || "#"}
-                            key={post._id}
-                            className="group flex flex-col rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden bg-white"
-                        >
-                            {post.image && (
-                                <div className="aspect-16/10 w-full">
-                                    <img
-                                        src={post.image}
-                                        alt={post.title}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    />
-                                </div>
-                            )}
-                            {showLink && (
-                                <h4 className="h-15 p-2 text-sm md:text-base font-bold text-gray-900 group-hover:text-main line-clamp-2">
+                        <a key={post._id} href={post.postUrl || "#"} className="group flex flex-col bg-white rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all">
+                            <div className="w-full aspect-16/10 overflow-hidden shrink-0">
+                                <img
+                                    src={post.image}
+                                    alt={post.title}
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-101"
+                                />
+                            </div>
+                            <div className="p-3.5 flex flex-col flex-1">
+                                {showCategory && post.categoryTitle && (
+                                    <span className="text-xs font-bold text-red-600 mb-1.5">
+                                        {post.categoryTitle}
+                                    </span>
+                                )}
+                                <h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 line-clamp-2 leading-snug transition-colors">
                                     {post.title}
-                                </h4>
-                            )}
+                                </h3>
+                            </div>
                         </a>
                     ))}
                 </div>
@@ -169,8 +171,10 @@ function Kalbela1CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela1UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
+            limit={limit}
             columnsDesktop={Number(c.columnsDesktop) || 3}
             columnsTablet={Number(c.columnsTablet) || 3}
             columnsMobile={Number(c.columnsMobile) || 1}
@@ -227,72 +231,56 @@ const kalbela1Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Section Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Total Posts Limit">
-                            <NumberControl label="Limit" value={value ?? 7} onChange={onChange} min={2} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 7} onChange={onChange} min={2} max={30} />
                     ),
                 },
                 {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Desktop)">
-                            <NumberControl label="Desktop Columns" value={value ?? 3} onChange={onChange} min={2} max={6} />
-                        </Section>
+                        <NumberControl label="Desktop Columns" value={value ?? 3} onChange={onChange} min={2} max={6} />
                     ),
                 },
                 {
                     name: "columnsTablet",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Tablet)">
-                            <NumberControl label="Tablet Columns" value={value ?? 3} onChange={onChange} min={1} max={4} />
-                        </Section>
+                        <NumberControl label="Tablet Columns" value={value ?? 3} onChange={onChange} min={1} max={4} />
                     ),
                 },
                 {
                     name: "columnsMobile",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Columns (Mobile)">
-                            <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
-                        </Section>
+                        <NumberControl label="Mobile Columns" value={value ?? 1} onChange={onChange} min={1} max={2} />
                     ),
                 },
                 {
                     name: "showCategory",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showDate",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -305,9 +293,7 @@ const kalbela1Element = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Color" defaultOpen>
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? ""} onChange={onChange} />
                     ),
                 },
             ],

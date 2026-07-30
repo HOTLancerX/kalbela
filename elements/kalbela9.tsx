@@ -11,13 +11,12 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
 } from "@/components/builder/controls";
 import { CategorySorter } from "../lib/CategorySorter";
 import { Tab, TabPost, NewsColors } from "../lib/types";
-import { useKalbelaPosts } from "../hooks/useKalbelaPosts";
+import { useKalbelaPosts, getDisplayPosts } from "../hooks/useKalbelaPosts";
 import { KalbelaHeader } from "../lib/KalbelaHeader";
 
 interface Kalbela9Colors extends NewsColors {
@@ -28,6 +27,7 @@ interface Kalbela9Colors extends NewsColors {
 
 interface Kalbela9Props {
     title?: string;
+    categoryIds?: string[];
     tabs?: Tab[];
     postsByCategory?: Record<string, TabPost[]>;
     limit?: number;
@@ -63,6 +63,7 @@ interface Kalbela9Props {
 
 export function Kalbela9UI({
     title = "",
+    categoryIds = [],
     tabs = [],
     postsByCategory = {},
     limit,
@@ -97,8 +98,8 @@ export function Kalbela9UI({
         }
     }, [tabs, activeTab]);
 
-    const rawPosts = postsByCategory[activeTab] ?? [];
-    const posts = limit ? rawPosts.slice(0, Number(limit)) : rawPosts;
+    const allPosts = getDisplayPosts(postsByCategory, activeTab, categoryIds, tabs[0]?._id);
+    const posts = limit ? allPosts.slice(0, Number(limit)) : allPosts;
 
     const topSubCountNum = Math.max(1, Number(topSubCount) || 2);
     const leadPost = posts[0];
@@ -307,6 +308,7 @@ function Kalbela9CanvasPreview({ element }: { element: any }) {
     return (
         <Kalbela9UI
             title={c.title ?? ""}
+            categoryIds={categoryIds}
             tabs={tabs}
             postsByCategory={postsByCategory}
             limit={limit}
@@ -349,8 +351,8 @@ function Kalbela9CanvasPreview({ element }: { element: any }) {
 const kalbela9Element = {
     type: "kalbela-9",
     category: "kalbela",
-    label: "Bottom Grid",
-    icon: "solar:layout-grid-bold",
+    label: "Kalbela 9 (Composite Lead + Sub Cards Grid)",
+    icon: "solar:layout-3-bold",
 
     schema: {
         content: {
@@ -402,207 +404,49 @@ const kalbela9Element = {
                     name: "title",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title" defaultOpen>
-                            <Text label="Title" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <Text label="Title" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "categoryIds",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Categories" defaultOpen>
-                            <CategorySorter value={value ?? []} onChange={onChange} />
-                        </Section>
+                        <CategorySorter value={value ?? []} onChange={onChange} />
                     ),
                 },
                 {
                     name: "limit",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Limit">
-                            <NumberControl label="Total Limit" value={value ?? 7} onChange={onChange} min={3} max={30} />
-                        </Section>
+                        <NumberControl label="Total Limit" value={value ?? 7} onChange={onChange} min={3} max={30} />
                     ),
                 },
                 {
                     name: "topSubCount",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Count">
-                            <NumberControl label="Sub Count" value={value ?? 2} onChange={onChange} min={1} max={6} />
-                        </Section>
+                        <NumberControl label="Top Sub Count" value={value ?? 2} onChange={onChange} min={1} max={6} />
                     ),
                 },
                 {
                     name: "topSubColumnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Cols (Dex)">
-                            <NumberControl label="Cols (Dex)" value={value ?? 2} onChange={onChange} min={1} max={4} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "topSubColumnsTablet",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Cols (Tab)">
-                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "topSubColumnsMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Cols (Mob)">
-                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
-                        </Section>
+                        <NumberControl label="Top Sub Columns (Desktop)" value={value ?? 2} onChange={onChange} min={1} max={4} />
                     ),
                 },
                 {
                     name: "columnsDesktop",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Cols (Dex)">
-                            <NumberControl label="Cols (Dex)" value={value ?? 4} onChange={onChange} min={2} max={5} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "columnsTablet",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Cols (Tab)">
-                            <NumberControl label="Cols (Tab)" value={value ?? 2} onChange={onChange} min={1} max={3} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "columnsMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Cols (Mob)">
-                            <NumberControl label="Cols (Mob)" value={value ?? 1} onChange={onChange} min={1} max={2} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leadImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 1 Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 220} onChange={onChange} min={100} max={600} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "leadImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 1 Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={400} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "topSubImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 180} onChange={onChange} min={100} max={600} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "topSubImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 140} onChange={onChange} min={80} max={400} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "bottomImageHeightDesktop",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Img Ht (Dex)">
-                            <NumberControl label="Ht (px)" value={value ?? 160} onChange={onChange} min={80} max={500} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "bottomImageHeightMobile",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Img Ht (Mob)">
-                            <NumberControl label="Ht (px)" value={value ?? 120} onChange={onChange} min={60} max={300} />
-                        </Section>
+                        <NumberControl label="Bottom Grid Columns (Desktop)" value={value ?? 4} onChange={onChange} min={2} max={6} />
                     ),
                 },
                 {
                     name: "showLeadExcerpt",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Sec 1 Display">
-                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showTopSubExcerpt",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Display">
-                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showBottomExcerpt",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Display">
-                            <Toggle label="Show Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showLeadCategory",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 1 Display">
-                            <Toggle label="Show Category" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showTopSubCategory",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 2 Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showBottomCategory",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Sec 3 Display">
-                            <Toggle label="Show Category" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "showDate",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Display">
-                            <Toggle label="Show Date" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Lead Excerpt" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -615,36 +459,21 @@ const kalbela9Element = {
                     name: "leadBgColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Lead Box bg Color" defaultOpen>
-                            <ColorPickerPopup label="Background Color" value={value ?? "#000000"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Lead Panel Bg" value={value ?? "#000000"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leadTitleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Lead Box Title Color">
-                            <ColorPickerPopup label="Title Color" value={value ?? "#fbbf24"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Lead Title Color" value={value ?? "#fbbf24"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leadTextColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Lead Box Text Color">
-                            <ColorPickerPopup label="Text Color" value={value ?? "#d1d5db"} onChange={onChange} />
-                        </Section>
-                    ),
-                },
-                {
-                    name: "titleColor",
-                    responsive: false,
-                    render: (value: any, onChange: any) => (
-                        <Section label="Cards Title Color">
-                            <ColorPickerPopup label="Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Lead Text Color" value={value ?? "#d1d5db"} onChange={onChange} />
                     ),
                 },
             ],

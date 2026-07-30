@@ -16,7 +16,6 @@ import { Icon } from "@iconify/react";
 import {
     Text,
     NumberControl,
-    Section,
     ColorPickerPopup,
     Toggle,
     Select,
@@ -331,109 +330,87 @@ const titleElement = {
                     name: "leftMediaType",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Media Type">
-                            <Select
-                                label="Left Type"
-                                value={value ?? "icon"}
-                                onChange={onChange}
-                                options={[
-                                    { value: "icon", label: "Single Icon" },
-                                    { value: "two-icons", label: "Two Icons" },
-                                    { value: "image", label: "Image URL" },
-                                    { value: "none", label: "None" },
-                                ]}
-                            />
-                        </Section>
+                        <Select
+                            label="Left Type"
+                            value={value ?? "icon"}
+                            onChange={onChange}
+                            options={[
+                                { value: "icon", label: "Single Icon" },
+                                { value: "two-icons", label: "Two Icons" },
+                                { value: "image", label: "Image URL" },
+                                { value: "none", label: "None" },
+                            ]}
+                        />
                     ),
                 },
                 {
                     name: "leftIcon1",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Primary Left Icon">
-                            <IconPicker label="Icon 1" value={value ?? "solar:document-text-bold"} onChange={onChange} />
-                        </Section>
+                        <IconPicker label="Primary Left Icon" value={value ?? "solar:document-text-bold"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leftIcon2",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Secondary Left Icon">
-                            <IconPicker label="Icon 2" value={value ?? "solar:fire-bold"} onChange={onChange} />
-                        </Section>
+                        <IconPicker label="Secondary Left Icon" value={value ?? "solar:fire-bold"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leftImage",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Image URL">
-                            <Text label="Image URL" value={value ?? ""} onChange={onChange} placeholder="https://..." />
-                        </Section>
+                        <Text label="Left Image URL" value={value ?? ""} onChange={onChange} placeholder="https://..." />
                     ),
                 },
                 {
                     name: "showRightSide",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Side Settings" defaultOpen>
-                            <Toggle label="Show Right Side" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Right Side" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "showRightText",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Text Toggle">
-                            <Toggle label="Show Text Label" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Text Label" value={value === "true"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "rightLinkText",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Link Text">
-                            <Text label="Label Text" value={value ?? ""} onChange={onChange} placeholder="সব দেখুন" />
-                        </Section>
+                        <Text label="Right Link Text" value={value ?? ""} onChange={onChange} placeholder="সব দেখুন" />
                     ),
                 },
                 {
                     name: "rightLinkUrl",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Link URL">
-                            <Text label="URL" value={value ?? "#"} onChange={onChange} />
-                        </Section>
+                        <Text label="Right Link URL" value={value ?? "#"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "showRightIcon",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Icon Toggle">
-                            <Toggle label="Show Right Icon" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Right Icon" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
                 {
                     name: "rightIcon",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Icon">
-                            <IconPicker label="Right Icon" value={value ?? "solar:alt-arrow-right-circle-bold"} onChange={onChange} />
-                        </Section>
+                        <IconPicker label="Right Icon" value={value ?? "solar:alt-arrow-right-circle-bold"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "showBorder",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Bottom Border Settings" defaultOpen>
-                            <Toggle label="Show Bottom Border" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
-                        </Section>
+                        <Toggle label="Show Bottom Border" value={value !== "false"} onChange={(v: boolean) => onChange(v ? "true" : "false")} />
                     ),
                 },
             ],
@@ -446,117 +423,91 @@ const titleElement = {
                     name: "titleColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Styling" defaultOpen>
-                            <ColorPickerPopup label="Title Color" value={value ?? "#000000"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Title Color" value={value ?? "#000000"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "titleFontSize",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Title Size">
-                            <NumberControl label="Font Size (px)" value={value ?? 20} onChange={onChange} min={12} max={48} />
-                        </Section>
+                        <NumberControl label="Title Size (px)" value={value ?? 20} onChange={onChange} min={12} max={48} />
                     ),
                 },
                 {
                     name: "leftIcon1Bg",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Icon 1 Styling" defaultOpen>
-                            <ColorPickerPopup label="Background Color" value={value ?? "#dc2626"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Left Icon 1 Bg" value={value ?? "#dc2626"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leftIcon1Color",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Icon 1 Color">
-                            <ColorPickerPopup label="Icon Color" value={value ?? "#ffffff"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Left Icon 1 Color" value={value ?? "#ffffff"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leftIcon1Size",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Icon 1 Size">
-                            <NumberControl label="Icon Size (px)" value={value ?? 16} onChange={onChange} min={10} max={48} />
-                        </Section>
+                        <NumberControl label="Left Icon 1 Size (px)" value={value ?? 16} onChange={onChange} min={10} max={48} />
                     ),
                 },
                 {
                     name: "leftIcon2Bg",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Icon 2 Styling">
-                            <ColorPickerPopup label="Background Color" value={value ?? ""} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Left Icon 2 Bg" value={value ?? ""} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leftIcon2Color",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Icon 2 Color">
-                            <ColorPickerPopup label="Icon Color" value={value ?? "#dc2626"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Left Icon 2 Color" value={value ?? "#dc2626"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "leftIcon2Size",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Left Icon 2 Size">
-                            <NumberControl label="Icon Size (px)" value={value ?? 18} onChange={onChange} min={10} max={48} />
-                        </Section>
+                        <NumberControl label="Left Icon 2 Size (px)" value={value ?? 18} onChange={onChange} min={10} max={48} />
                     ),
                 },
                 {
                     name: "rightIconColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Side Styling" defaultOpen>
-                            <ColorPickerPopup label="Right Icon Color" value={value ?? "#000000"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Right Icon Color" value={value ?? "#000000"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "rightIconSize",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Right Icon Size">
-                            <NumberControl label="Size (px)" value={value ?? 24} onChange={onChange} min={12} max={48} />
-                        </Section>
+                        <NumberControl label="Right Icon Size (px)" value={value ?? 24} onChange={onChange} min={12} max={48} />
                     ),
                 },
                 {
                     name: "borderColor",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Border Styling" defaultOpen>
-                            <ColorPickerPopup label="Border Color" value={value ?? "#000000"} onChange={onChange} />
-                        </Section>
+                        <ColorPickerPopup label="Border Color" value={value ?? "#000000"} onChange={onChange} />
                     ),
                 },
                 {
                     name: "borderThickness",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Border Thickness">
-                            <NumberControl label="Thickness (px)" value={value ?? 3} onChange={onChange} min={1} max={10} />
-                        </Section>
+                        <NumberControl label="Border Thickness (px)" value={value ?? 3} onChange={onChange} min={1} max={10} />
                     ),
                 },
                 {
                     name: "borderGap",
                     responsive: false,
                     render: (value: any, onChange: any) => (
-                        <Section label="Border Gap">
-                            <NumberControl label="Gap (px)" value={value ?? 8} onChange={onChange} min={0} max={30} />
-                        </Section>
+                        <NumberControl label="Border Gap (px)" value={value ?? 8} onChange={onChange} min={0} max={30} />
                     ),
                 },
             ],
