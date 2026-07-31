@@ -73,7 +73,7 @@ registerBuilderElement("kalbela", async (schema, data) => {
 
     return (
         <KalbelaUI
-            title={c.title ?? "শিরোনাম"}
+            title={c.title ?? "Breaking"}
             posts={posts}
             limit={limit}
             speed={Number(c.speed) || 35}
